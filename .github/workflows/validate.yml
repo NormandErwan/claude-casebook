@@ -25,13 +25,12 @@ jobs:
           else
             claude plugin validate .
           fi
-      - name: SKILL.md version matches plugin.json
-        # Single-skill plugins only: casebook ships two skills, versioned by plugin.json alone.
+      - name: SKILL.md versions match plugin.json
         run: |
           for m in plugins/*/.claude-plugin/plugin.json; do
-            d=${m%/.claude-plugin/plugin.json}; n=$(jq -r .name "$m")
-            s="$d/skills/$n/SKILL.md"
-            [ -f "$s" ] || continue
-            sv=$(sed -n 's/^version: *//p' "$s" | head -1); pv=$(jq -r .version "$m")
-            [ "$sv" = "$pv" ] || { echo "$n: SKILL.md $sv != plugin.json $pv"; exit 1; }
+            d=${m%/.claude-plugin/plugin.json}; pv=$(jq -r .version "$m")
+            for s in "$d"/skills/*/SKILL.md; do
+              sv=$(sed -n 's/^version: *//p' "$s" | head -1)
+              [ "$sv" = "$pv" ] || { echo "$s: $sv != plugin.json $pv"; exit 1; }
+            done
           done

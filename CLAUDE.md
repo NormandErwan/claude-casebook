@@ -13,8 +13,8 @@ another project.
 
 ## Changing a skill
 
-- Bump `version` in the skill's `SKILL.md` per `write-skill` semver, and set the same value in
-  its plugin's `plugin.json`. The marketplace entry carries no version.
+- Bump `version` per `write-skill` semver. A plugin has one version: its `plugin.json` and every
+  `SKILL.md` in it carry the same value (CI checks). The marketplace entry carries no version.
 - Rule or skill change -> `log-rule-incident` (provenance row) and `test-rule-change` (evidence)
   apply here as anywhere.
 - Third-party content added or changed -> update the skill's `SOURCES.md` and `LICENSES/`.
