@@ -1,0 +1,14 @@
+{
+  "name": "write-skill",
+  "version": "2.4.2",
+  "description": "Writes and tests Agent Skills: RED-GREEN-REFACTOR for docs, A/B evals, trigger tuning.",
+  "author": {
+    "name": "Erwan Normand"
+  },
+  "homepage": "https://github.com/NormandErwan/claude-casebook",
+  "repository": "https://github.com/NormandErwan/claude-casebook",
+  "license": "BSD-3-Clause AND MIT AND Apache-2.0",
+  "keywords": [
+    "skills"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "write-hook",
+  "version": "1.1.0",
+  "description": "Writes Claude Code hooks whose output actually reaches the model, without restart cascades.",
+  "author": {
+    "name": "Erwan Normand"
+  },
+  "homepage": "https://github.com/NormandErwan/claude-casebook",
+  "repository": "https://github.com/NormandErwan/claude-casebook",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "skills"
+  ]
+}

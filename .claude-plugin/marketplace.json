@@ -1,0 +1,8 @@
+{
+  "name": "claude-casebook",
+  "owner": { "name": "Erwan Normand" },
+  "metadata": {
+    "description": "Skills for writing rules, skills and hooks for Claude, and a method to keep each rule backed by a logged case."
+  },
+  "plugins": []
+}
