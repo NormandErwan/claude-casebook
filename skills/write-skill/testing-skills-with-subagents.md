@@ -140,7 +140,7 @@ Forces explicit choice.
 
 **Best tests combine 3+ pressures.**
 
-**Why this works:** See craft-prompt/SKILL.md for research on how authority, scarcity, and commitment principles increase compliance pressure.
+**Why this works:** See [`persuasion-principles.md`](https://github.com/obra/superpowers/blob/main/skills/writing-skills/references/persuasion-principles.md) in obra/superpowers for research on how authority, scarcity, and commitment principles increase compliance pressure.
 
 ### Key Elements of Good Scenarios
 
@@ -386,4 +386,4 @@ From applying TDD to TDD skill itself (2025-10-03):
 
 ---
 
-_Source: [`mattpocock/skills` — `writing-skills`](https://github.com/mattpocock/skills) (MIT). See `SOURCES.md`._
+_Source: [`obra/superpowers` — `writing-skills`](https://github.com/obra/superpowers) (MIT). See `SOURCES.md`._

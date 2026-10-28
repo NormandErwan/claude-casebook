@@ -1,6 +1,6 @@
 ---
 name: write-skill
-version: 2.4.1
+version: 2.4.2
 description: Use when creating a new skill, editing an existing one, verifying a skill works
   before deployment, benchmarking whether it improves task quality, fixing unreliable
   triggering, or when an agent rationalizes around a skill's rules.
@@ -454,13 +454,11 @@ state the rule once at the level it actually applies, not as a growing list of e
 - [ ] SKILL.md body under 500 lines (use progressive disclosure if over)
 - [ ] No Windows-style paths (forward slashes only)
 - [ ] Tested on Haiku, Sonnet, and Opus (not one model only)
-- [ ] `craft-prompt` pass for structure and degrees-of-freedom guidance before drafting (see `CONTRIBUTING.md` Rule maintenance)
+- [ ] Prompt-structure pass (exact triggers, degrees of freedom) before drafting, e.g. with a `craft-prompt` skill
 - [ ] Body and reference files write clean on the first draft: cut superfluous words, never fuse or drop meaning to shorten - no post-hoc tightening pass
 
 **Deployment:**
 - [ ] Every checklist item above re-verified against the finished file - drafting-time self-checks alone can miss gaps (e.g. a planned example that never made it in)
-- [ ] Native skill (this repo) -> add its 2 lines to `.gitignore`, verify with `git status`
-- [ ] New skill or version bump -> follow `SKILLS.md`'s procedure (row, `Web`, zip)
 - [ ] Commit skill to git and push to your fork (if configured)
 - [ ] Consider contributing back via PR (if broadly useful)
 
@@ -488,4 +486,4 @@ If you follow TDD for code, follow it for skills. It's the same discipline appli
 
 ---
 
-_Base: [`mattpocock/skills` — `writing-skills`](https://github.com/mattpocock/skills) (MIT). Evaluation machinery absorbed from Anthropic `skill-creator` example (Apache-2.0). See `SOURCES.md`._
+_Base: [`obra/superpowers` — `writing-skills`](https://github.com/obra/superpowers) (MIT). Evaluation machinery absorbed from Anthropic `skill-creator` example (Apache-2.0). See `SOURCES.md`._

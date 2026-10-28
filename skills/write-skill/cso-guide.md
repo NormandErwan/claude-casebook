@@ -162,4 +162,4 @@ before you need them.
 
 ---
 
-_Base: [`mattpocock/skills` — `writing-skills`](https://github.com/mattpocock/skills) (MIT). See `SOURCES.md`._
+_Base: [`obra/superpowers` — `writing-skills`](https://github.com/obra/superpowers) (MIT). See `SOURCES.md`._
