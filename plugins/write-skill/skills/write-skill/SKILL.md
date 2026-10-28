@@ -20,7 +20,7 @@ You write test cases (pressure scenarios with subagents), watch them fail (basel
 
 **REQUIRED BACKGROUND:** You MUST understand agent-skills:test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
 
-**Official guidance:** For Anthropic's official skill authoring best practices on skills with executable code, see `executable-code-skills.md`.
+**Skills with executable code:** see `executable-code-skills.md`, a summary of Anthropic's skill authoring best practices with a link to the full page.
 
 ## What is a Skill?
 
