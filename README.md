@@ -31,7 +31,7 @@ incidents). The full history of each skill came along.
 | `write-skill` | Write and test Agent Skills: baseline-first (RED-GREEN-REFACTOR for documentation), A/B evals, trigger tuning |
 | `write-hook` | Write Claude Code hooks whose output reaches the model, without a `Stop` hook restart cascade |
 
-Each plugin carries its own version in `plugins/<name>/.claude-plugin/plugin.json`. Releases are
+Each plugin carries its own version in `plugins/<name>/.claude-plugin/plugin.json`. Releases will be
 tagged `<plugin>--v<version>`.
 
 ## Install
