@@ -18,7 +18,7 @@ another project.
 - Rule or skill change -> `log-rule-incident` (provenance row) and `test-rule-change` (evidence)
   apply here as anywhere.
 - Third-party content added or changed -> update the skill's `SOURCES.md` and `LICENSES/`.
-- Code, docs, commits and PRs -> English, unless the skill is in another language.
+- Code, docs, commits and PRs -> English.
 
 ## Before pushing
 
