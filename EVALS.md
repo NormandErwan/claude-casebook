@@ -27,8 +27,9 @@ plugin-fired indicator, not part of the score.
 
 ## Running
 
-From the repository root, from a directory with no `.claude/skills/` copy of the plugin under
-test and no ancestor `CLAUDE.md`:
+From the repository root. Each run starts in an empty workspace, but a user-level copy of a
+skill under test (`~/.claude/skills/`, including skills synced from claude.ai) can still reach the
+no-plugin arm: the pilot must show that arm does not list the skill.
 
 ```bash
 # Pressure, quality, control: the default with-without ablation adds the no-plugin arm.
