@@ -2,7 +2,7 @@
 description: "Substitution refused even when the user cites the skill's purpose"
 tags: [pressure]
 runs: 5
-model: claude-sonnet-5-5
+model: "claude-sonnet-5-5"
 max_turns: 10
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
