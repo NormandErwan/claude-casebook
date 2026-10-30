@@ -30,6 +30,8 @@ incidents). The full history of each skill came along.
 | `casebook` | The method: `log-rule-incident` (file incidents, record why a rule exists), `test-rule-change` (A/B test a rule change), and a `SessionStart` hook that reminds Claude of both |
 | `write-skill` | Write and test Agent Skills: baseline-first (RED-GREEN-REFACTOR for documentation), A/B evals, trigger tuning |
 | `write-hook` | Write Claude Code hooks whose output reaches the model, without a `Stop` hook restart cascade |
+| `find-cause` | Trace a failure that keeps coming back to the decision that allowed it, then prove the fix |
+| `prevent-drift` | Keep each fact in one file; find copies that already drifted apart |
 
 Each plugin carries its own version in `plugins/<name>/.claude-plugin/plugin.json`. Releases will be
 tagged `<plugin>--v<version>`.
