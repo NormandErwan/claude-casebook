@@ -1,0 +1,15 @@
+{
+  "name": "prevent-drift",
+  "version": "1.2.0",
+  "description": "Keeps each fact in one file and finds copies that have already drifted apart across CLAUDE.md, skills, docs and config.",
+  "author": {
+    "name": "Erwan Normand"
+  },
+  "homepage": "https://github.com/NormandErwan/claude-casebook",
+  "repository": "https://github.com/NormandErwan/claude-casebook",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "claude-md",
+    "documentation"
+  ]
+}

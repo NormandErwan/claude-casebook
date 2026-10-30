@@ -41,7 +41,7 @@ decision starts as `proposed`.
 
 Processing happens later, on purpose. Reading every row first is how a recurrence shows up: the
 same class filed a second time means the earlier fix did not hold. A recurrence calls for finding
-the cause, not for extending the same rule once more.
+the cause (the `find-cause` plugin), not for extending the same rule once more.
 
 ### Why the provenance row comes in the next commit
 
@@ -50,19 +50,16 @@ lands in the following commit of the same change, so the rule and its reason mer
 
 ## Testing a rule change
 
-Stakes decide the evidence:
+`test-rule-change` sets the evidence each change needs and the steps of an A/B test. Why:
 
-- **A rule that applies in every session, or that gates a push, a pull request or a deletion:
-  A/B test before merging.** It touches every session, so a wrong rule costs more than the test.
-- **Any other rule: name how its effect will be observed.** The observation counts only when the
-  owner can judge the outcome by reading the reply. If judging it means taking the case apart,
-  A/B test instead.
-- **The owner may waive a test**, and the waiver is recorded in the rule's provenance row with
-  its reason. A skipped test is then visible later, when the rule misbehaves.
-
-The test runs on the reviewed wording, with isolated arms and a pilot run first: a baseline that
-never fails cannot show that the change helped. `claude plugin eval` runs the cases and adds the
-no-plugin arm. `test-rule-change` lists the steps.
+- **Stakes decide the evidence.** A rule that runs in every session, or gates an action that is
+  hard to undo, costs more when wrong than a test costs to run. A narrower rule can be watched.
+- **Watching counts only when the reply shows the outcome.** If judging it means taking the case
+  apart, the observation is an A/B test run without a baseline.
+- **A waived test is written down.** When the rule misbehaves later, the record shows it was
+  never measured.
+- **Review first, pilot first.** A run on a draft measures text that will not ship. A baseline
+  that never fails cannot show the change helped, and a pilot finds that out for one run's cost.
 
 ## Three real rows
 
