@@ -1,6 +1,6 @@
 {
   "name": "write-skill",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Writes and tests Agent Skills: RED-GREEN-REFACTOR for docs, A/B evals, trigger tuning.",
   "author": {
     "name": "Erwan Normand"

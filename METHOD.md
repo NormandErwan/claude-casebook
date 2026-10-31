@@ -101,3 +101,42 @@ family of rules is phrased (trigger -> action) instead of adding a seventh rule.
    `log-rule-incident` create them on the first incident.
 3. Backfill provenance only for the rules you are about to change. A full archaeology pass is
    optional.
+
+## Where it comes from
+
+What each source contributes to the method. The links go to the primary source.
+
+**Practice**
+
+- **Test-first documentation:** [obra/superpowers `writing-skills`](https://github.com/obra/superpowers/tree/main/skills/writing-skills):
+  "no skill without a failing test first". `test-rule-change` applies it to rules: the baseline
+  arm has to show the failure first.
+- **Evidence before a claim:** superpowers `verification-before-completion`. A rule change does
+  not "work" until it has been measured.
+- **Blameless postmortems:** [Google SRE book, ch. 15](https://sre.google/sre-book/postmortem-culture/)
+  recommends defining triggers before incidents and looking for contributing causes, not
+  culprits. The retrospective ledger works the same way: its events are listed in advance, and
+  a row names a class of failure, not who caused it.
+- **Architecture decision records:** [Nygard, 2011](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions):
+  a decision is recorded with its context and status (`proposed`, `accepted`, `superseded`).
+  A provenance row does the same for a rule.
+- **Kaizen root-cause tools** (A3, 5 whys, fishbone, PDCA), as packaged in
+  [NeoLabHQ/context-engineering-kit `kaizen`](https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/kaizen):
+  `find-cause` is written from these public methods.
+
+**Research**
+
+- **Learning from failures without retraining:** Reflexion ([Shinn et al., 2023](https://arxiv.org/abs/2303.11366))
+  keeps the agent's reflections on its feedback in memory. ExpeL ([Zhao et al., AAAI 2024](https://arxiv.org/abs/2308.10144))
+  turns successes and failures into reusable insights. The casebook does both by hand, across
+  sessions: one row per failure, and a rule only once a case justifies it.
+- **Add small changes, don't rewrite:** ACE ([Zhang et al., ICLR 2026](https://arxiv.org/abs/2510.04618))
+  shows that rewriting a context over and over erodes its details ("context collapse"), and that
+  small structured updates avoid this. This is why filing only appends, and why processing
+  extends an existing rule instead of rewriting it.
+- **Every rule costs:** IFScale ([Jaroslawicz et al., 2025](https://arxiv.org/abs/2507.11538))
+  finds that models follow fewer instructions as more pile up, favouring earlier ones; the best
+  models reach 68% accuracy at 500 instructions. Context files raise agent cost by over 20%
+  without improving success in general ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)).
+  Models also use information in the middle of a long context less well ([Liu et al., TACL](https://arxiv.org/abs/2307.03172)).
+  Hence "a rule earns its place" and "delete, don't patch".
