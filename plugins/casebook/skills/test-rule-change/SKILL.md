@@ -1,6 +1,6 @@
 ---
 name: test-rule-change
-version: 0.1.0
+version: 0.2.0
 description: Use before merging a change to a rule that applies in every session (a CLAUDE.md
   rule, a SessionStart hook's text, a skill description) or to a rule that gates a push, a pull
   request or a deletion; also when about to claim that a rule change works, or when a reviewer

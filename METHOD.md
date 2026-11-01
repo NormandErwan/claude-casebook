@@ -43,6 +43,16 @@ Processing happens later, on purpose. Reading every row first is how a recurrenc
 same class filed a second time means the earlier fix did not hold. A recurrence calls for finding
 the cause (the `find-cause` plugin), not for extending the same rule once more.
 
+### Why each row carries its evidence
+
+The session that processes a row is not the one that filed it, and it cannot question the agent
+that failed. A row that only paraphrases leaves it two bad choices: trust the agent's own
+diagnosis, or redo the investigation. In the source setup, a processing session took a row's
+premise about the origin session as verified, and the premise was false
+([`RETROSPECTIVE.md` line 65](https://github.com/NormandErwan/Claude/blob/26eeb04fb6148694cb58c23e8c1958272ee59fbf/RETROSPECTIVE.md#L65)). So the user's words are quoted, the
+agent's reading is labeled as a hypothesis, and a premise nobody can check carries no rule
+alone.
+
 ### Why the provenance row comes in the next commit
 
 The row cites the commit that changed the rule, and a commit cannot cite its own hash. The row
