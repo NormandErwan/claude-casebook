@@ -1,6 +1,7 @@
 # Sources
 
 This skill merges three upstream skills and a summary of Anthropic's documentation.
+Skills it only names are listed at the end.
 Each file carries a brief inline citation; this document gives the full provenance.
 Licence texts are in `LICENSES/`. Everything not listed here is original to this repository
 (BSD 3-Clause, root `LICENSE`).
@@ -55,3 +56,16 @@ history never held a `writing-skills` skill.
 - **Used for:** `executable-code-skills.md` summarises the page's "Advanced: Skills with
   executable code" section in our own words and links to it; two anti-patterns and three
   checklist items in `SKILL.md` follow the same page. No text of the page is reproduced.
+
+---
+
+## Referenced, not bundled
+
+These skills are named in `SKILL.md`; none of their text ships here.
+
+- **`craft-prompt`** (prompt-structure pass, Skill Creation Checklist): the author's renamed fork
+  of `prompt-engineering` from
+  [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/customaize-agent/skills/prompt-engineering)
+  (GPL-3.0). Any prompt-engineering skill can play this role.
+- **`agent-skills:test-driven-development`** (background reading): from
+  [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).

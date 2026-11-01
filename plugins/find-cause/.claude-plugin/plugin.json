@@ -1,6 +1,6 @@
 {
   "name": "find-cause",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Traces a failure that keeps coming back to the decision that allowed it, then proves the fix with evidence named in advance.",
   "author": {
     "name": "Erwan Normand"

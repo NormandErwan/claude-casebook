@@ -1,6 +1,6 @@
 {
   "name": "casebook",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Keeps every rule you give Claude backed by a logged case: file incidents as they happen, record why each rule exists, A/B test rule changes before merging.",
   "author": { "name": "Erwan Normand" },
   "homepage": "https://github.com/NormandErwan/claude-casebook",

@@ -1,7 +1,7 @@
 ---
 name: find-cause
 description: Use when a failure or friction keeps coming back after a fix - a repeat incident, a recurring CI or build break, the same review comment raised again, a Retrospective event firing a second time, or when someone asks why this keeps happening. Not for debugging a single live bug in progress (`debugging-and-error-recovery` covers that). Personal, non-technical judgment calls route to `guide-decision`/`guide-purchase`.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Find Cause

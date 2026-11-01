@@ -1,6 +1,6 @@
 ---
 name: log-rule-incident
-version: 0.1.0
+version: 0.2.0
 description: Use when the user corrects you, when a rule or skill failed to fire or did not cover
   the case, when a tool block forced another approach, or when the user states a new preference.
   Also when adding, rewording or retiring a rule in a CLAUDE.md or a skill, or when asked to
@@ -25,12 +25,16 @@ Missing ledger -> copy it from `templates/` in this skill's directory first.
 Append one row, without reading the ledger (reading it costs context the current task needs):
 
 ```
-| <date> | <events> | <class> | <smallest change> | <rule it replaces, or nothing> | proposed | - |
+| <date> | <events> | <class> | <evidence> | <smallest change> | <rule it replaces, or nothing> | proposed | - |
 ```
 
 - `events`: one or more of `fact-corrected`, `skill-gap`, `tool-blocked`, `new-preference`.
 - `class`: the kind of failure, never this instance. Test: would the row still read true
   on a different task, file and wording? If not, it names the instance.
+- `evidence`: what lets a later session, which has none of this context, check the row: the
+  user's words quoted as `user: "..."`, a commit, PR or `file:line`, a command and its output.
+  Your own reading of what went wrong is marked `hypothesis:`, never stated as fact. Nothing
+  to cite -> `none`.
 - `smallest change`: extend an existing rule before proposing a new one. A skill's own
   misbehavior goes back to that skill.
 
@@ -49,11 +53,13 @@ the same change (a commit cannot cite its own hash): date, section, rule, commit
 ## Processing proposed entries
 
 1. Read the whole `retrospective.md` first.
-2. An entry whose class matches an earlier one is a recurrence: find the cause (why the earlier
+2. Check each entry's `Evidence` before taking its premise as fact. A premise with no evidence
+   and no way to confirm it here is marked `not checkable here`: no rule rests on it alone.
+3. An entry whose class matches an earlier one is a recurrence: find the cause (why the earlier
    fix did not hold) before extending the same rule again.
-3. A rule that only fires on one session's tool, file or wording is out of scope: close it.
-4. A rule that costs more than it returns is deleted, not compensated by another rule.
-5. Apply the change, set `Decision` to `applied` and `Landed in` to the change that carries it;
+4. A rule that only fires on one session's tool, file or wording is out of scope: close it.
+5. A rule that costs more than it returns is deleted, not compensated by another rule.
+6. Apply the change, set `Decision` to `applied` and `Landed in` to the change that carries it;
    or `no change` / `closed`, with the reason.
 
 ## Common Mistakes
@@ -63,6 +69,7 @@ the same change (a commit cannot cite its own hash): date, section, rule, commit
 | Row names the file, tool or prompt of this session | Rewrite as the class it belongs to |
 | Proposing a new rule next to one that already covers the case | Extend that rule |
 | Fixing the rule in the same turn the incident is filed | File `proposed`; process later, with the whole ledger read |
+| Your diagnosis written as fact, or the user's words paraphrased | Quote `user: "..."`; mark your reading `hypothesis:` |
 | Reading the ledger before filing | Append blind; reading is for processing |
 | Re-extending a rule on its second incident | Recurrence -> find the cause first |
 | Provenance row in the same commit as the rule | Next commit: it must cite the rule's commit |
