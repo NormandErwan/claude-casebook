@@ -52,18 +52,20 @@ Per-file details: each skill's `SOURCES.md` and `LICENSES/`.
 
 ## Install
 
-The marketplace lists a plugin only once its evals pass, and none has passed yet. Until then:
+The marketplace lists a plugin only once its evals pass. Listed so far: `write-prompt`.
+
+```
+/plugin install write-prompt --marketplace NormandErwan/claude-casebook
+```
+
+On Claude Code before 2.1.275, add the marketplace first:
+`/plugin marketplace add NormandErwan/claude-casebook`, then `/plugin install write-prompt@claude-casebook`.
+
+The other plugins are not listed yet:
 
 - One skill: `npx skills add NormandErwan/claude-casebook -s write-skill -a claude-code`
   (with the [`skills`](https://github.com/vercel-labs/skills) installer)
 - A whole plugin, hook included, from a clone: `claude --plugin-dir plugins/casebook`
-
-Once listed:
-
-```
-/plugin marketplace add NormandErwan/claude-casebook
-/plugin install casebook@claude-casebook
-```
 
 ## Licence
 
