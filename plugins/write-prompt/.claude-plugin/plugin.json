@@ -1,0 +1,15 @@
+{
+  "name": "write-prompt",
+  "version": "2.0.0",
+  "description": "Writes prompts another model reads - CLAUDE.md rules, skills, commands, hook messages, subagent and API prompts - covering only what Claude skips on its own.",
+  "author": {
+    "name": "Erwan Normand"
+  },
+  "homepage": "https://github.com/NormandErwan/claude-casebook",
+  "repository": "https://github.com/NormandErwan/claude-casebook",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "prompt-engineering",
+    "claude-md"
+  ]
+}
