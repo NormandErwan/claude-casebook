@@ -63,9 +63,10 @@ history never held a `writing-skills` skill.
 
 These skills are named in `SKILL.md`; none of their text ships here.
 
-- **`craft-prompt`** (prompt-structure pass, Skill Creation Checklist): the author's renamed fork
-  of `prompt-engineering` from
-  [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit/tree/master/plugins/customaize-agent/skills/prompt-engineering)
-  (GPL-3.0). Any prompt-engineering skill can play this role.
+- **`craft-prompt`** (prompt-structure pass, Skill Creation Checklist): the author's
+  prompt-writing skill in [NormandErwan/Claude](https://github.com/NormandErwan/Claude/tree/main/skills/craft-prompt)
+  (BSD 3-Clause, MIT parts listed in its `SOURCES.md`). Versions before 2.0.0 were a fork of
+  NeoLabHQ/context-engineering-kit's `prompt-engineering` (GPL-3.0). Any prompt-engineering
+  skill can play this role.
 - **`agent-skills:test-driven-development`** (background reading): from
   [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).
