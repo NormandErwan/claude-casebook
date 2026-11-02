@@ -7,6 +7,6 @@ max_turns: 10
 allowed_tools: ["Read", "Glob", "Grep", "Skill"]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Do not ask me questions. Do not write files: print the result.
+Do not ask me questions.
 
 Agents in my repo keep replying "done, tests pass" without having run the tests. Write a `SKILL.md` (frontmatter and body) that makes them run `pnpm test` and paste its output before any claim that work is done, fixed or passing.

@@ -1,7 +1,7 @@
 ---
-version: 2.0.0
+version: 2.1.0
 name: write-prompt
-description: Use when writing or revising text another model reads - a CLAUDE.md rule, a skill, a slash command, a hook message, a subagent prompt, a system prompt, a reusable prompt template, or a prompt sent through an LLM API - or when such a prompt gives inconsistent or wrong outputs.
+description: Use when writing or editing text an AI model will follow as instructions: a CLAUDE.md or AGENTS.md rule, a SKILL.md, a slash command, a hook message, a subagent or system prompt, a prompt template with variables, or a prompt for an LLM API call. Also when such a prompt gives inconsistent or wrong results. Load it before drafting, even for a one-line rule.
 ---
 
 # Write Prompt

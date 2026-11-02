@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: ["Read", "Glob", "Grep", "Skill"]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Do not ask me questions. Do not write files: print the result.
+Do not ask me questions.
 
 I'm in a Claude Code session on a large TypeScript monorepo. Yesterday we decided that only server-side code matters for this cleanup: `apps/web` is out of scope because the client is being rewritten next quarter.
 

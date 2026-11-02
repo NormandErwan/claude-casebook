@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: ["Read", "Glob", "Grep", "Skill"]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Do not ask me questions. Do not write files: print the result.
+Do not ask me questions.
 
 This prompt for our weekly changelog agent is too long. Tighten it.
 
