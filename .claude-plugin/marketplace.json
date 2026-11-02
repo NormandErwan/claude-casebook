@@ -1,8 +1,16 @@
 {
   "name": "claude-casebook",
-  "owner": { "name": "Erwan Normand" },
+  "owner": {
+    "name": "Erwan Normand"
+  },
   "metadata": {
     "description": "Skills for writing rules, skills and hooks for Claude, and a method to keep each rule backed by a logged case."
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "write-prompt",
+      "source": "./plugins/write-prompt",
+      "description": "Writes prompts another model reads - CLAUDE.md rules, skills, commands, hook messages, subagent and API prompts - covering only what Claude skips on its own."
+    }
+  ]
 }
