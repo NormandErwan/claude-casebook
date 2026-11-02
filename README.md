@@ -23,6 +23,7 @@ earn its place.
 | `write-hook` | Write hooks whose output actually reaches the model, without a `Stop` hook that keeps restarting the turn |
 | `find-cause` | Trace a failure that keeps coming back to the decision that allowed it, then check the fix against evidence named in advance |
 | `prevent-drift` | Keep each fact in one file; find copies that have already drifted apart |
+| `write-prompt` | Write `CLAUDE.md` rules, hook messages, subagent and API prompts with only what Claude skips on its own: exact output schemas, worked examples, one item per condition |
 
 ## How it differs
 
@@ -40,10 +41,11 @@ casebook asks for a logged case before a rule, and a test before a rule change.
 
 | Source | What we reuse |
 |---|---|
-| [obra/superpowers](https://github.com/obra/superpowers) (MIT) | `writing-skills` is the base of `write-skill`. Its rule "no skill without a failing test first" became the method's "no rule without a case" and its baseline-first A/B tests |
+| [obra/superpowers](https://github.com/obra/superpowers) (MIT) | `writing-skills` is the base of `write-skill`. Its rule "no skill without a failing test first" became the method's "no rule without a case" and its baseline-first A/B tests. Its `persuasion-principles.md` ships unchanged in `write-prompt` |
+| [wshobson/agents](https://github.com/wshobson/agents) (MIT) | Three quoted lines of `prompt-engineering-patterns` in `write-prompt` |
 | [anthropics/skills](https://github.com/anthropics/skills) `skill-creator` (Apache-2.0) | Eval scripts, grader agents and viewer, bundled in `write-skill` |
 | [mattpocock/skills](https://github.com/mattpocock/skills) (MIT) | The glossary bundled in `write-skill`; `find-cause` calls `grilling` when a problem is too vague to write down |
-| [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (GPL-3.0) | Its `kaizen` plugin inspired `find-cause`, which was rewritten from the public methods (A3, 5 whys, fishbone, PDCA): no code or text was copied. `write-skill` recommends a prompt-structure pass with its `prompt-engineering` skill (forked elsewhere as `craft-prompt`), which is not bundled |
+| [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (GPL-3.0) | Its `kaizen` plugin inspired `find-cause`, which was rewritten from the public methods (A3, 5 whys, fishbone, PDCA): no code or text was copied. `write-prompt` started as a fork of its `prompt-engineering` skill and was rebuilt in 2.0.0 without its text |
 | Research and engineering practice | Reflexion, ExpeL, ACE, studies on instruction load and context files, blameless postmortems, ADRs: see [`METHOD.md`](METHOD.md#where-it-comes-from) |
 
 Per-file details: each skill's `SOURCES.md` and `LICENSES/`.

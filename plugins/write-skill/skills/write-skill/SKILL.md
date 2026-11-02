@@ -454,7 +454,7 @@ state the rule once at the level it actually applies, not as a growing list of e
 - [ ] SKILL.md body under 500 lines (use progressive disclosure if over)
 - [ ] No Windows-style paths (forward slashes only)
 - [ ] Tested on Haiku, Sonnet, and Opus (not one model only)
-- [ ] Prompt-structure pass (exact triggers, degrees of freedom) before drafting, e.g. with a `craft-prompt` skill
+- [ ] Prompt-structure pass (exact triggers, one item per condition) before drafting, e.g. with the `write-prompt` plugin
 - [ ] Body and reference files write clean on the first draft: cut superfluous words, never fuse or drop meaning to shorten - no post-hoc tightening pass
 
 **Deployment:**
