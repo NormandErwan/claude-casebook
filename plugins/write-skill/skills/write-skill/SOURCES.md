@@ -18,6 +18,9 @@ Licence texts are in `LICENSES/`. Everything not listed here is original to this
   - `graphviz-conventions.dot`
   - `render-graphs.js`
   - `examples/CLAUDE_MD_TESTING.md`
+- **Changes:** scenario templates in `testing-skills-with-subagents.md` and
+  `examples/CLAUDE_MD_TESTING.md` drop the `IMPORTANT: This is a real scenario` header and the
+  advice to tell the agent it is not a quiz.
 
 Earlier versions of this file attributed these to mattpocock/skills. That was wrong: its
 history never held a `writing-skills` skill.
@@ -46,7 +49,10 @@ history never held a `writing-skills` skill.
   - `assets/eval_review.html`
   - `references/schemas.md`
 - **Changes:** internal references renamed from `skill-creator` to this skill; `quick_validate.py`
-  accepts a `version` frontmatter field.
+  accepts a `version` frontmatter field; `utils.py` reads a description continued on indented
+  lines; `--num-workers` defaults to 2; the `improve_description.py` prompt asks for a
+  third-person "Use when..." description under 500 characters; `--verbose` help text fixed;
+  example model ID in `references/schemas.md` updated.
 
 ---
 

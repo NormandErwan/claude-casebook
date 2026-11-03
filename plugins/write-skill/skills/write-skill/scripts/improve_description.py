@@ -129,10 +129,11 @@ Based on the failures, write a new and improved description that is more likely 
 1. Avoid overfitting
 2. The list might get loooong and it's injected into ALL queries and there might be a lot of skills, so we don't want to blow too much space on any given description.
 
-Concretely, your description should not be more than about 100-200 words, even if that comes at the cost of accuracy. There is a hard limit of 1024 characters — descriptions over that will be truncated, so stay comfortably under it.
+Concretely, keep the description under 500 characters if possible, even if that comes at the cost of accuracy. There is a hard limit of 1024 characters — descriptions over that will be truncated, so stay comfortably under it.
 
 Here are some tips that we've found to work well in writing these descriptions:
-- The skill should be phrased in the imperative -- "Use this skill for" rather than "this skill does"
+- Write it in the third person and start with "Use when..." followed by the triggering conditions: symptoms, situations, contexts.
+- Say when to use the skill, never what it does or how its workflow runs: a description that summarizes the workflow gets followed instead of the skill body.
 - The skill description should focus on the user's intent, what they are trying to achieve, vs. the implementation details of how the skill works.
 - The description competes with other skills for Claude's attention — make it distinctive and immediately recognizable.
 - If you're getting lots of failures after repeated attempts, change things up. Try different sentence structures or wordings.
@@ -197,7 +198,7 @@ def main():
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
     parser.add_argument("--history", default=None, help="Path to history JSON (previous attempts)")
     parser.add_argument("--model", required=True, help="Model for improvement")
-    parser.add_argument("--verbose", action="store_true", help="Print thinking to stderr")
+    parser.add_argument("--verbose", action="store_true", help="Print the current and improved descriptions to stderr")
     args = parser.parse_args()
 
     skill_path = Path(args.skill_path)

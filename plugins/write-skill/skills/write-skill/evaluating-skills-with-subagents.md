@@ -79,7 +79,7 @@ Each subagent run should save:
 - `transcript.md` — full execution transcript
 - `outputs/` — all output files produced
 - `outputs/metrics.json` — tool usage counts (schema: `references/schemas.md`)
-- `outputs/timing.json` — wall-clock timing; capture `total_tokens` and `duration_ms` from the
+- `timing.json` (in the run directory, beside `outputs/`) — wall-clock timing; capture `total_tokens` and `duration_ms` from the
   task notification immediately — they are not persisted elsewhere
 
 Organize runs like:
@@ -283,8 +283,9 @@ Quality A/B evaluation requires the full CLI environment.
 
 ### Cowork (--static flag)
 
-When running scripts inside a Cowork session, the scripts may need the `--static` flag to
-disable network requests and work within the static execution environment.
+Where the review viewer cannot start a local server, as in a Cowork session, run
+`eval-viewer/generate_review.py --static <file.html>`: it writes a standalone HTML file instead.
+No other script takes this flag.
 
 ---
 

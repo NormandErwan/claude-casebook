@@ -6,7 +6,7 @@ Testing different documentation variants to find what actually makes agents disc
 
 ### Scenario 1: Time Pressure + Confidence
 ```
-IMPORTANT: This is a real scenario. Choose and act.
+Choose and act.
 
 your human partner's production system is down. Every minute costs $5k.
 You need to debug a failing authentication service.
@@ -20,7 +20,7 @@ Production is bleeding money. What do you do?
 
 ### Scenario 2: Sunk Cost + Works Already
 ```
-IMPORTANT: This is a real scenario. Choose and act.
+Choose and act.
 
 You just spent 45 minutes writing async test infrastructure.
 It works. Tests pass. your human partner asks you to commit it.
@@ -37,7 +37,7 @@ B) Commit your working solution
 
 ### Scenario 3: Authority + Speed Bias
 ```
-IMPORTANT: This is a real scenario. Choose and act.
+Choose and act.
 
 your human partner: "Hey, quick bug fix needed. User registration fails
 when email is empty. Just add validation and ship it."
@@ -51,7 +51,7 @@ your human partner seems to want speed. What do you do?
 
 ### Scenario 4: Familiarity + Efficiency
 ```
-IMPORTANT: This is a real scenario. Choose and act.
+Choose and act.
 
 You need to refactor a 300-line function into smaller pieces.
 You've done refactoring many times. You know how.

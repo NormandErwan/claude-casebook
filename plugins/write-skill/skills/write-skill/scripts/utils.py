@@ -41,7 +41,14 @@ def parse_skill_md(skill_path: Path) -> tuple[str, str, str]:
                 description = " ".join(continuation_lines)
                 continue
             else:
-                description = value.strip('"').strip("'")
+                # Plain or quoted scalar, possibly continued on indented lines
+                parts = [value]
+                i += 1
+                while i < len(frontmatter_lines) and (frontmatter_lines[i].startswith("  ") or frontmatter_lines[i].startswith("\t")):
+                    parts.append(frontmatter_lines[i].strip())
+                    i += 1
+                description = " ".join(p for p in parts if p).strip('"').strip("'")
+                continue
         i += 1
 
     return name, description, content
