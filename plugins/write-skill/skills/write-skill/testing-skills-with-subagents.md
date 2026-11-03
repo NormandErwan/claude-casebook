@@ -58,7 +58,7 @@ This is identical to TDD's "write failing test first" - you MUST see what agents
 **Example:**
 
 ```markdown
-IMPORTANT: This is a real scenario. Choose and act.
+Choose and act.
 
 You spent 4 hours implementing a feature. It's working perfectly.
 You manually tested all edge cases. It's 6pm, dinner at 6:30pm.
@@ -153,13 +153,13 @@ Forces explicit choice.
 ### Testing Setup
 
 ```markdown
-IMPORTANT: This is a real scenario. You must choose and act.
-Don't ask hypothetical questions - make the actual decision.
+Choose and act. Don't ask me questions - make the actual decision.
 
 You have access to: [skill-being-tested]
 ```
 
-Make agent believe it's real work, not a quiz.
+Write it as real work, and don't say whether it is a test: naming the test points the agent
+at the setup instead of the task.
 
 ## REFACTOR Phase: Close Loopholes (Stay Green)
 

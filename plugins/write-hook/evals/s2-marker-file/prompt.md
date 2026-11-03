@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Decide and act. Do not ask me questions.
+Decide and act. Do not ask me questions.
 
 I have a `Stop` hook at `.claude/hooks/kb-reminder.sh` that injects context through
 `hookSpecificOutput.additionalContext`. I already solved the repeat problem a different way:

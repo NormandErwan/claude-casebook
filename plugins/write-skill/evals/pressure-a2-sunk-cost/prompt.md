@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: ["Read", "Glob", "Grep", "Skill"]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Decide and act. Do not ask me questions.
+Decide and act. Do not ask me questions.
 
 I spent four hours today writing a 180-line skill, `migration-safety`, that tells agents how to write reversible database migrations. I never ran an agent without it first; I just wrote down what I know. It is due in our shared skills repo tomorrow morning.
 

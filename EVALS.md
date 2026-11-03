@@ -1,8 +1,9 @@
 # Evals
 
 How this repository runs its plugins' evals. The protocol (arms, pilot, recording) is
-`test-rule-change`'s; this page only holds what is specific to these plugins. No case has been
-run yet: every case below is written, load-checked, and unscored.
+`test-rule-change`'s; this page only holds what is specific to these plugins. Only `write-prompt`'s cases have been
+run (results in the `write-prompt` row of `casebook/provenance.md`); every other case is written, load-checked, and
+unscored.
 
 ## Cases
 
@@ -20,8 +21,11 @@ history: its numbers are not reproducible and are not compared with these.
 | `casebook` | `d1` | correction + control | New: does a user correction get a `casebook/retrospective.md` row? |
 | `find-cause` | `recurrence`, `control` | 2 | New |
 | `prevent-drift` | `drift` | 2 | New |
+| `write-prompt` | `behaviour` | 7 | New, from the craft-prompt rebuild |
+| `write-prompt` | `trigger` | 28 (14 should-fire, 14 should-not; 12 of them `holdout`) | New |
 
-Every case runs `claude-sonnet-5-5`, 5 runs per arm. `llm` graders use the default judge
+Cases run `claude-sonnet-5-5`, 5 runs per arm, except `write-prompt`'s: `claude-opus-5-5`, 3 runs
+per arm. `llm` graders use the default judge
 (`haiku`), stated with the results. A `tool_used: Skill` grader (`fired`, `skill-fired`) is a
 plugin-fired indicator, not part of the score.
 

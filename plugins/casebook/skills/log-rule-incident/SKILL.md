@@ -1,6 +1,6 @@
 ---
 name: log-rule-incident
-version: 0.2.0
+version: 0.3.0
 description: Use when the user corrects you, when a rule or skill failed to fire or did not cover
   the case, when a tool block forced another approach, or when the user states a new preference.
   Also when adding, rewording or retiring a rule in a CLAUDE.md or a skill, or when asked to
@@ -15,14 +15,14 @@ A rule earns its place with a logged case. Two ledgers at the repo root keep the
 
 | Ledger | One row per | Written |
 |---|---|---|
-| `casebook/retrospective.md` | incident: a correction, a rule that did not fire, a forced workaround | at once, without reading the ledger |
+| `casebook/retrospective.md` | incident: a correction, a rule that did not fire, a forced workaround | at once, as one more row |
 | `casebook/provenance.md` | rule: why it exists, what changed it | in the commit after the rule changes |
 
 Missing ledger -> copy it from `templates/` in this skill's directory first.
 
 ## Filing an incident
 
-Append one row, without reading the ledger (reading it costs context the current task needs):
+Add one row at the end of the ledger:
 
 ```
 | <date> | <events> | <class> | <evidence> | <smallest change> | <rule it replaces, or nothing> | proposed | - |
@@ -70,7 +70,6 @@ the same change (a commit cannot cite its own hash): date, section, rule, commit
 | Proposing a new rule next to one that already covers the case | Extend that rule |
 | Fixing the rule in the same turn the incident is filed | File `proposed`; process later, with the whole ledger read |
 | Your diagnosis written as fact, or the user's words paraphrased | Quote `user: "..."`; mark your reading `hypothesis:` |
-| Reading the ledger before filing | Append blind; reading is for processing |
 | Re-extending a rule on its second incident | Recurrence -> find the cause first |
 | Provenance row in the same commit as the rule | Next commit: it must cite the rule's commit |
 

@@ -31,11 +31,11 @@ Both live in `casebook/` at your repository root. Templates ship with `log-rule-
 | `retrospective.md` | What went wrong, and what change would prevent its class? | When it happens |
 | `provenance.md` | Why does this rule exist, and what has changed it since? | In the commit after the rule changes |
 
-### Why file without reading the ledger
+### Why filing only adds a row
 
-An incident is filed in the middle of other work. Reading the whole ledger at that moment costs
-context the task needs, and tempts a fix on the spot. So filing is append-only, and the row's
-decision starts as `proposed`.
+An incident is filed in the middle of other work, which tempts a fix on the spot. So filing adds
+one row at the end, and the row's decision starts as `proposed`: the fix waits for processing,
+when the whole ledger is read.
 
 ### Why processing reads the whole ledger
 
