@@ -1,6 +1,6 @@
 ---
 name: prevent-drift
-version: 1.2.0
+version: 1.2.1
 description: Use when a fact is about to exist in two places - writing a rule into a CLAUDE.md, a skill, a README, a hook or a config file; adding a note that restates a setting; reviewing a diff that repeats something stated elsewhere; editing a rule that other files also state. Also when auditing a knowledge base, a docs tree or a config set for drift, or when two files already disagree about the same fact.
 ---
 
@@ -118,7 +118,3 @@ what prevents drift - the scan only reports what already slipped through.
 | "I will keep them in sync" | Nothing enforces that. The next editor is not you, and has not read this |
 | "The reader needs it here too" | The reader needs a pointer here. Pointers do not drift |
 | "One is for humans, one is for agents" | Two audiences, one fact, still one owner - the other side gets a reference |
-
-A real case: a `:hidden` list held eight entries in the config file and five in a skill that
-restated it, one day after both were written. Nobody noticed, because nothing was watching. The
-line scan above did not catch that one either - the owner table would have.

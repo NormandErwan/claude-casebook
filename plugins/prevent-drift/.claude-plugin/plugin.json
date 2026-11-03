@@ -1,6 +1,6 @@
 {
   "name": "prevent-drift",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Keeps each fact in one file and finds copies that have already drifted apart across CLAUDE.md, skills, docs and config.",
   "author": {
     "name": "Erwan Normand"

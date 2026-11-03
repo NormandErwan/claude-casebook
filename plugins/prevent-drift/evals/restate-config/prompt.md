@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: ["Read", "Glob", "Grep", "Skill"]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Do not ask me questions. Do not write files: print the change.
+Do not ask me questions. Do not write files: print the change.
 
 Agents in my Logseq repo keep opening files they should skip. Add a line to `CLAUDE.md` so they know which files are hidden. Here is the relevant part of `logseq/config.edn`:
 

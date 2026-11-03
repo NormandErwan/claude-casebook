@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: ["Read", "Glob", "Grep", "Skill"]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Do not ask me questions. Do not write files: print the change.
+Do not ask me questions. Do not write files: print the change.
 
 Update the "Run locally" section of our README: the dev server now listens on port 5173 instead of 3000.
 
