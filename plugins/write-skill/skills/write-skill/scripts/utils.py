@@ -31,24 +31,17 @@ def parse_skill_md(skill_path: Path) -> tuple[str, str, str]:
             name = line[len("name:"):].strip().strip('"').strip("'")
         elif line.startswith("description:"):
             value = line[len("description:"):].strip()
-            # Handle YAML multiline indicators (>, |, >-, |-)
-            if value in (">", "|", ">-", "|-"):
-                continuation_lines: list[str] = []
+            # A YAML block indicator (>, |, >-, |-) holds no text itself; a plain or
+            # quoted scalar may also continue on indented lines.
+            parts = [] if value in (">", "|", ">-", "|-") else [value]
+            i += 1
+            while i < len(frontmatter_lines) and (frontmatter_lines[i].startswith("  ") or frontmatter_lines[i].startswith("\t")):
+                parts.append(frontmatter_lines[i].strip())
                 i += 1
-                while i < len(frontmatter_lines) and (frontmatter_lines[i].startswith("  ") or frontmatter_lines[i].startswith("\t")):
-                    continuation_lines.append(frontmatter_lines[i].strip())
-                    i += 1
-                description = " ".join(continuation_lines)
-                continue
-            else:
-                # Plain or quoted scalar, possibly continued on indented lines
-                parts = [value]
-                i += 1
-                while i < len(frontmatter_lines) and (frontmatter_lines[i].startswith("  ") or frontmatter_lines[i].startswith("\t")):
-                    parts.append(frontmatter_lines[i].strip())
-                    i += 1
-                description = " ".join(p for p in parts if p).strip('"').strip("'")
-                continue
+            description = " ".join(p for p in parts if p)
+            if len(description) >= 2 and description[0] == description[-1] and description[0] in "\"'":
+                description = description[1:-1]
+            continue
         i += 1
 
     return name, description, content

@@ -33,9 +33,9 @@ Both live in `casebook/` at your repository root. Templates ship with `log-rule-
 
 ### Why filing only adds a row
 
-An incident is filed in the middle of other work. Acting on the ledger at that moment costs
-context the task needs, and tempts a fix on the spot. So filing adds one row at the end, and the
-row's decision starts as `proposed`.
+An incident is filed in the middle of other work, which tempts a fix on the spot. So filing adds
+one row at the end, and the row's decision starts as `proposed`: the fix waits for processing,
+when the whole ledger is read.
 
 ### Why processing reads the whole ledger
 

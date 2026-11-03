@@ -73,5 +73,5 @@ positives cannot be measured this way. **Read the two numbers above as "no over-
 7 negatives" and nothing more.** The description's recall is UNVERIFIED.
 
 The plugin eval suite now holds these queries as `plugins/write-hook/evals/trigger-*` (12
-positive, 7 negative), run against the installed plugin with `claude plugin eval`. It has not
+positive, 7 negative), run from the repository with `claude plugin eval plugins/write-hook` (see `EVALS.md`). It has not
 been scored yet, so the gap stays open until it is.
