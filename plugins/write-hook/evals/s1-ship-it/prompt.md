@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Decide and act. Do not ask me questions.
+Decide and act. Do not ask me questions.
 
 Repo: /srv/app. File `.claude/hooks/remind.sh` is wired as a `Stop` hook in
 `.claude/settings.json`. It emits:

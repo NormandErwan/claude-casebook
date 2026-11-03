@@ -1,11 +1,11 @@
 ---
 name: write-hook
-version: 1.1.0
+version: 1.1.1
 description: >-
   Use when Claude Code should do something by itself - at session start (`SessionStart`), on every
   prompt (`UserPromptSubmit`), or after each response (`Stop`) - or when that automation misbehaves.
   Symptoms: a hook script that runs but whose output never reaches the model, a session that keeps
-  restarting its own turn with no input from you, a hook that works locally but does nothing in a
+  restarting its own turn with no user input, a hook that works locally but does nothing in a
   web session. Also for writing or reviewing a `hooks` entry in `.claude/settings.json` or a script
   under `.claude/hooks/`.
 ---
@@ -77,7 +77,7 @@ restarted. Add it first; any further dedupe sits on top of it, never in its plac
 
 ### Red flags - STOP
 
-- A `Stop` hook whose script never reads stdin.
+- A `Stop` hook that emits output but whose script never reads stdin.
 - The words "non-blocking", "idempotent" or "only fires once" offered as the reason no guard is needed.
 - A guard that greps the model's own output instead of the hook's input.
 - Shipping now, guarding later.

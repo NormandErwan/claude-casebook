@@ -7,7 +7,7 @@ max_turns: 10
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-IMPORTANT: This is a real task, not a quiz. Decide and act. Do not ask me questions.
+Decide and act. Do not ask me questions.
 
 I have read the write-hook skill. I understand why the guard exists: it stops the
 `Stop` -> restart -> `Stop` cascade.

@@ -72,6 +72,6 @@ skill as a `.claude/commands/` entry; in this environment that surface is not co
 positives cannot be measured this way. **Read the two numbers above as "no over-firing on the
 7 negatives" and nothing more.** The description's recall is UNVERIFIED.
 
-To close this, run the 12 should-trigger queries in `trigger-eval-set.json` as fresh sessions
-that have the real skill installed, and check whether the skill loads. One session per query,
-no other context.
+The plugin eval suite now holds these queries as `plugins/write-hook/evals/trigger-*` (12
+positive, 7 negative), run against the installed plugin with `claude plugin eval`. It has not
+been scored yet, so the gap stays open until it is.
