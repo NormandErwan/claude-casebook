@@ -1,7 +1,7 @@
 ---
 name: find-cause
-description: Use when a failure or friction keeps coming back after a fix - a repeat incident, a recurring CI or build break, the same review comment raised again, a Retrospective event firing a second time, or when someone asks why this keeps happening. Not for debugging a single live bug in progress (`debugging-and-error-recovery` covers that). Personal, non-technical judgment calls route to `guide-decision`/`guide-purchase`.
-version: 1.0.1
+description: Use when a failure or friction keeps coming back after a fix - a repeat incident, a recurring CI or build break, the same review comment raised again, a Retrospective event firing a second time, or when someone asks why this keeps happening. Not for debugging a single live bug in progress. Personal, non-technical judgment calls route to `guide-decision`/`guide-purchase`.
+version: 1.0.2
 ---
 
 # Find Cause
@@ -66,6 +66,9 @@ it is a buying decision. One-way; finish there.
 | "Config was deliberately kept out of the repo, never replaced" | Design decision | Stop |
 
 ## Example
+
+Illustrative only: a real trace takes as many steps as its chain needs, and its frame and
+evidence come from the case at hand.
 
 > **Frame** - Background: staging blocks releases. Current condition: staging
 > deploy failed 4 times in 6 weeks, each on a missing config key. Target:
