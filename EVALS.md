@@ -2,7 +2,7 @@
 
 How this repository runs its plugins' evals. The protocol (arms, pilot, recording) is
 `test-rule-change`'s; this page only holds what is specific to these plugins. Only `write-prompt`'s cases have been
-run in full (results in the `write-prompt` row of `casebook/provenance.md`; `backlog`'s were piloted only, in its row); every other case is written, load-checked, and
+run in full (results in the `write-prompt` row of `casebook/provenance.md`; `backlog`'s were piloted at 1 run per arm, then `first-use-asks-conventions` A/B-tested 0.1.0 vs 0.1.1 at 5 runs, in its row); every other case is written, load-checked, and
 unscored.
 
 ## Cases
@@ -26,7 +26,7 @@ history: its numbers are not reproducible and are not compared with these.
 | `backlog` | `first-use`, `conventions`, `control` | 3 | New, minimal by the owner's request; fixtures written by each case's `scaffold.sh` |
 
 Cases run `claude-sonnet-5-5`, 5 runs per arm, except `write-prompt`'s: `claude-opus-5-5`, 3 runs
-per arm, and `backlog`'s: 1 run per arm. `llm` graders use the default judge
+per arm, and `backlog`'s pilot: 1 run per arm. `llm` graders use the default judge
 (`haiku`), stated with the results. A `tool_used: Skill` grader (`fired`, `skill-fired`) is a
 plugin-fired indicator, not part of the score.
 
