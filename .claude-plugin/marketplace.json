@@ -11,6 +11,11 @@
       "name": "write-prompt",
       "source": "./plugins/write-prompt",
       "description": "Writes prompts another model reads - CLAUDE.md rules, skills, commands, hook messages, subagent and API prompts - covering only what Claude skips on its own."
+    },
+    {
+      "name": "backlog",
+      "source": "./plugins/backlog",
+      "description": "Keeps work not done yet as short handoffs a fresh session can start from: one section per task in the repo's BACKLOG.md, or issues in the tracker you name."
     }
   ]
 }

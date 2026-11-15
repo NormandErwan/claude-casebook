@@ -43,6 +43,11 @@ Processing happens later, on purpose. Reading every row first is how a recurrenc
 same class filed a second time means the earlier fix did not hold. A recurrence calls for finding
 the cause (the `find-cause` plugin), not for extending the same rule once more.
 
+An accepted change too large to make in a few lines becomes a task in the repository's backlog
+(the optional `backlog` plugin, or any tracker) instead of being made during processing.
+Implementing a plan-sized change there mixes two jobs, and the rest of the ledger goes
+unreviewed. The bounds are in [`log-rule-incident`](plugins/casebook/skills/log-rule-incident/SKILL.md).
+
 ### Why each row carries its evidence
 
 The session that processes a row is not the one that filed it, and it cannot question the agent
