@@ -1,6 +1,6 @@
 ---
 name: log-rule-incident
-version: 0.3.0
+version: 0.4.0
 description: Use when the user corrects you, when a rule or skill failed to fire or did not cover
   the case, when a tool block forced another approach, or when the user states a new preference.
   Also when adding, rewording or retiring a rule in a CLAUDE.md or a skill, or when asked to
@@ -59,8 +59,14 @@ the same change (a commit cannot cite its own hash): date, section, rule, commit
    fix did not hold) before extending the same rule again.
 4. A rule that only fires on one session's tool, file or wording is out of scope: close it.
 5. A rule that costs more than it returns is deleted, not compensated by another rule.
-6. Apply the change, set `Decision` to `applied` and `Landed in` to the change that carries it;
-   or `no change` / `closed`, with the reason.
+6. Decide each entry:
+   - Change fits in a few lines of existing files, needs no A/B test and leaves no owner
+     decision open -> apply it; `Decision` `applied`, `Landed in` the change that carries it.
+   - Any other accepted change -> file a task in the repository's backlog (the `backlog` skill
+     if installed, else the repo's task tracker); `Decision` `accepted`, `Landed in` the task.
+     The PR that carries it later sets `applied` and cites itself. No backlog -> tell the user;
+     the entry stays `accepted`, `Landed in` `-`.
+   - Not accepted -> `no change` / `closed`, with the reason.
 
 ## Common Mistakes
 
