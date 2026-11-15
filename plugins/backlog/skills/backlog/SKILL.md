@@ -1,7 +1,7 @@
 ---
 name: backlog
-version: 0.1.0
-description: Use when work is deferred, discovered mid-session, or beyond the session's scope (e.g. a plan's large steps), or when a task in the repo's backlog (BACKLOG.md, or the issue tracker it names) is named, started, finished or dropped.
+version: 0.1.1
+description: Use when the user defers work or puts it out of scope ("later", "not now", "note it", "remind me", "out of scope"), when work is found mid-session but left undone, or when a plan has steps beyond this session; also when a task in the repo's backlog (BACKLOG.md, or the issue tracker it names) is named, started, finished or dropped.
 ---
 
 # Backlog
@@ -12,19 +12,11 @@ start from alone. It lives in the repo's root `BACKLOG.md`, or in an external tr
 
 ## Conventions
 
-Read the `## Conventions` block of `BACKLOG.md` first. Its values override this skill's
-defaults.
+Read the `## Conventions` block of `BACKLOG.md` first. Its values override this skill.
 
-No `BACKLOG.md` -> ask the user, in one message, before writing anything:
-
-1. Tracker: `BACKLOG.md` (default) or an external tracker, by name (GitHub Issues, Linear,
-   Jira...) and project.
-2. New tasks: added without asking (default), or proposed first.
-3. Finished task: its section deleted (default; the PR and git history keep the trace), or
-   moved to `BACKLOG-archive.md`. Skip with an external tracker: the issue is closed.
-4. `Owner steps` field: on (default) or off.
-
-"Defaults", or no preference -> defaults. Then create `BACKLOG.md`, then the task:
+No `BACKLOG.md` -> before writing anything, ask the user each line of the block below, in one
+message, default first. "Defaults" or no preference -> defaults. Write only the chosen values,
+then the task:
 
 ```
 # Backlog
@@ -33,26 +25,27 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 
 ## Conventions
 
-- Tracker: BACKLOG.md
-- New tasks: add without asking
-- Finished task: delete its section
-- Owner steps: on
+- Tracker: BACKLOG.md                 (or: <external tracker>, <project>)
+- New tasks: add without asking       (or: proposed first)
+- Finished task: delete its section   (or: move to BACKLOG-archive.md)
+- Owner steps: on                     (or: off)
 
 ## Tasks
 ```
 
-External tracker -> `- Tracker: <name>, <project>` and, instead of `## Tasks`, one line saying
-where the tasks live. `BACKLOG.md` holds no task then.
-
-`BACKLOG.md` with no `## Conventions` block -> add the default block under its header, and say
-so in one line.
+- External tracker -> one line saying where the tasks live replaces `## Tasks`; tasks follow
+  `External tracker` below; a finished task's issue is closed.
+- `move to BACKLOG-archive.md` -> wherever this skill says delete a task, move its section to
+  the end of that file, `Status` set to `done (<PR>)` or `dropped: <reason>`.
+- `Owner steps: off` -> no `Owner steps` field or `owner steps pending` status; the rules
+  naming them do not apply.
+- `BACKLOG.md` without the block -> add the default block under its header, say so in one line.
 
 ## Add a task
 
 - Not for: a question, or an edit done in this session.
-- `New tasks: add without asking` -> add it, reply with one line: its title. `proposed first`
-  -> give the title and `Next`, add it once the user agrees. Task has `Owner steps` -> the reply
-  also gives them, numbered, as written in the task.
+- Add it, reply with one line: its title (`proposed first` -> give title and `Next`, add it once
+  the user agrees). Task has `Owner steps` -> the reply also gives them, numbered, as written.
 - Search the backlog first. A matching task gets extended, not duplicated.
 - One task fits one PR. Larger work -> several tasks linked by `Blocked by`.
 
@@ -93,8 +86,6 @@ so in one line.
   paths and values, no placeholder left to fill. A secret is named by where the owner finds it,
   never written out. Each has a `Check` and an `Undo`. Agent steps never go here; owner steps
   never go in `Next` or `Context`.
-- `Owner steps: off` -> no `Owner steps` field, no `owner steps pending` status, and the rules
-  below that name them do not apply.
 - `Out of scope`: what the task must not touch.
 - Paths are fine. Line numbers are not (they go stale): name a symbol (function, config key)
   instead. Links to PRs and docs are fine.
@@ -126,8 +117,6 @@ in the reply, in the format above, for the user to file.
   carries the summary.
 - Dropped -> delete the task. The commit message gives the reason. Tasks it blocked -> re-check
   their `Status`.
-- Delete, with `Finished task: move to BACKLOG-archive.md` -> move the section to the end of
-  that file instead, its `Status` set to `done (<PR>)` or `dropped: <reason>`.
 - Title changed -> update every `Blocked by` that names it.
 - Task edited in an older format (fields not list items) -> convert it to the format above.
 - Any edit to `BACKLOG.md` -> commit it with the session's work: an uncommitted edit dies with
@@ -135,10 +124,8 @@ in the reply, in the format above, for the user to file.
 
 ## Red flags
 
-- Asking "add this to the backlog?" while the convention is `add without asking` -> add it,
-  reply with its title.
-- Ticking every box and keeping a done task in the backlog -> delete it (or archive it, per the
-  conventions).
+- Asking "add this to the backlog?" under `add without asking` -> add it, reply with its title.
+- Ticking every box and keeping a done task in the backlog -> delete it.
 - Writing a task before reading the `## Conventions` block, or overriding one of its values.
 - Adding an id or a number to a title.
 - `BACKLOG.md` edited but not committed.
