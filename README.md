@@ -23,6 +23,7 @@ earn its place.
 | `write-hook` | Write hooks whose output actually reaches the model, without a `Stop` hook that keeps restarting the turn |
 | `find-cause` | Trace a failure that keeps coming back to the decision that allowed it, then check the fix against evidence named in advance |
 | `prevent-drift` | Keep each fact in one file; find copies that have already drifted apart |
+| `backlog` | Claude files deferred work as short handoffs a fresh session can start from, in a root `BACKLOG.md` or the issue tracker you name, and deletes each task once its PR lands. The first use asks a few questions and records your choices in `BACKLOG.md` |
 | `write-prompt` | Write `CLAUDE.md` rules, hook messages, subagent and API prompts with only what Claude skips on its own: exact output schemas, worked examples, one item per condition |
 
 ## How it differs
