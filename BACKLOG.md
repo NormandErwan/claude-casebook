@@ -1,0 +1,91 @@
+# Backlog
+
+Work not done yet, one `###` section per task. Format and rules: the `backlog` skill.
+
+## Conventions
+
+- Tracker: BACKLOG.md
+- New tasks: add without asking
+- Finished task: delete its section
+- Owner steps: on
+
+## Tasks
+
+### Decide when plugins get tagged, then tag them
+- **Status:** needs owner: tag every merge that bumps a plugin's version, or only plugins listed in `.claude-plugin/marketplace.json`?
+- **Context:** `git tag -l` is empty: no plugin has ever been released, `write-prompt` and `backlog` included although the marketplace lists them. `CLAUDE.md` "Releasing" says how to tag, not when; `casebook/retrospective.md` row 2026-11-03 "A repository rule says how to release but not when" proposes the fix and is settled by this task.
+- **Next:** once the owner decides, extend `CLAUDE.md` "Releasing" with when to tag, and set that retrospective row to `applied` in the same PR.
+- **Done when:**
+  - [ ] `CLAUDE.md` "Releasing" says when a plugin is tagged
+  - [ ] The retrospective row is `applied`, `Landed in` this PR
+  - [ ] Every plugin the new rule covers has a `<name>--v<version>` tag on `origin`
+- **Owner steps:** after merge, from an up-to-date `main` checkout. Shown for the two listed plugins; add one step per other plugin the decision covers.
+  1. Tag `write-prompt`: `claude plugin tag plugins/write-prompt --push`
+     - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.1.1`
+     - Undo: `git push origin :refs/tags/write-prompt--v2.1.1 && git tag -d write-prompt--v2.1.1`
+  2. Tag `backlog`: `claude plugin tag plugins/backlog --push`
+     - Check: `git ls-remote --tags origin` lists `refs/tags/backlog--v0.1.1`
+     - Undo: `git push origin :refs/tags/backlog--v0.1.1 && git tag -d backlog--v0.1.1`
+- **Out of scope:** a workflow that tags automatically (file it as its own task if wanted).
+
+### Run the casebook evals and decide its marketplace entry
+- **Status:** ready
+- **Context:** `plugins/casebook/evals/` has 2 cases (`correction-files-row`, `control-no-correction`), written and load-checked, never scored (`EVALS.md`). Retrospective row 2026-11-03 "An eval case grades a file the agent must write while the case grants no tool that writes files" asks for a pilot first; `EVALS.md` now passes `--allow-tools Write Edit`. A plugin enters the marketplace only once its evals pass (`CLAUDE.md`).
+- **Next:** pilot one run per arm with the `EVALS.md` command and check that the no-plugin arm does not list the skill and that the correction case can write `casebook/retrospective.md`.
+- **Done when:**
+  - [ ] Pilot then full run (5 runs per arm, `claude-sonnet-5-5`) recorded in a `casebook/provenance.md` row, with cost
+  - [ ] The Write-grant retrospective row is decided
+  - [ ] `casebook` listed in `.claude-plugin/marketplace.json` if the evals pass, or the reason it is not in the provenance row
+- **Out of scope:** the hook-versus-no-hook comparison (next task).
+
+### Compare casebook with and without its SessionStart hook
+- **Status:** ready
+- **Blocked by:** Run the casebook evals and decide its marketplace entry
+- **Context:** `EVALS.md` section "D1" describes the run: the `d1` cases against a copy of `plugins/casebook` without `hooks/`. It answers whether the hook earns its context cost in every session (`METHOD.md` principles).
+- **Next:** build the no-hook copy and run the `d1` tag with the `EVALS.md` commands, pilot first.
+- **Done when:**
+  - [ ] Both arms scored at 5 runs per arm, results and cost in the `casebook` hook's provenance row
+  - [ ] Hook kept, changed or removed according to the result, through `test-rule-change`
+- **Out of scope:** multi-turn corrections via `context.history_file`.
+
+### Run the find-cause evals
+- **Status:** ready
+- **Context:** `plugins/find-cause/evals/` has 2 cases (`recurring-ci-break`, `control-single-bug`), never scored (`EVALS.md`). Over ~100 agent runs, launch from a fresh session: retrospective row 2026-11-02 on the shared usage quota.
+- **Next:** pilot one run per arm with `claude plugin eval plugins/find-cause --max-cost-usd <cap>`.
+- **Done when:**
+  - [ ] Pilot then full run recorded in a `casebook/provenance.md` row, with cost
+  - [ ] `find-cause` listed in `.claude-plugin/marketplace.json` if the evals pass, or the reason it is not in the row
+
+### Run the prevent-drift evals
+- **Status:** ready
+- **Context:** `plugins/prevent-drift/evals/` has 2 cases (`drifted-copies`, `restate-config`), never scored (`EVALS.md`).
+- **Next:** pilot one run per arm with `claude plugin eval plugins/prevent-drift --max-cost-usd <cap>`.
+- **Done when:**
+  - [ ] Pilot then full run recorded in a `casebook/provenance.md` row, with cost
+  - [ ] `prevent-drift` listed in `.claude-plugin/marketplace.json` if the evals pass, or the reason it is not in the row
+
+### Run the write-hook evals
+- **Status:** ready
+- **Context:** `plugins/write-hook/evals/` has 5 pressure/control cases and 19 trigger cases, never scored (`EVALS.md`). Trigger cases run with `--ablation none`. Over ~100 agent runs, launch from a fresh session (retrospective row 2026-11-02 on the usage quota).
+- **Next:** pilot one run per arm of the `pressure` and `control` tags with the `EVALS.md` command.
+- **Done when:**
+  - [ ] Pilot then full runs of both suites recorded in a `casebook/provenance.md` row, with cost
+  - [ ] `write-hook` listed in `.claude-plugin/marketplace.json` if the evals pass, or the reason it is not in the row
+- **Out of scope:** re-checking the harness claim dated 2026-08 (its own retrospective row).
+
+### Run the write-skill evals
+- **Status:** ready
+- **Context:** `plugins/write-skill/evals/` has 3 quality, 3 pressure and 12 trigger cases, never scored (`EVALS.md`). Two retrospective rows of 2026-11-03 plan to re-run `pressure-a1`..`a3` after rewording the skill: this run is their baseline. Launch from a fresh session if over ~100 agent runs.
+- **Next:** pilot one run per arm of the `pressure` and `quality` tags.
+- **Done when:**
+  - [ ] Pilot then full runs of all three suites recorded in a `casebook/provenance.md` row, with cost
+  - [ ] `write-skill` listed in `.claude-plugin/marketplace.json` if the evals pass, or the reason it is not in the row
+
+### Test the backlog plugin beyond its pilot
+- **Status:** ready
+- **Context:** `backlog` is listed in the marketplace on a pilot (1 run per arm) plus a trigger A/B on one case, a fuller run waived at the time (its `casebook/provenance.md` row). The owner now wants it tested properly. Untested behaviours include: extending a matching task instead of duplicating it, working a task (status, `Next` rewrite), deleting a done task, `Owner steps` listed in the reply, `Blocked by`, the archive and external-tracker conventions.
+- **Next:** list the skill's rules and red flags with no case covering them, then write cases for the ones that matter most, with `scaffold.sh` fixtures like the existing ones.
+- **Done when:**
+  - [ ] New cases under `plugins/backlog/evals/`, listed in `EVALS.md`
+  - [ ] Pilot, then every case at 5 runs per arm with-without on `claude-sonnet-5-5`, results and cost in the `backlog` provenance row
+  - [ ] Any failure filed in `casebook/retrospective.md` or fixed with a version bump
