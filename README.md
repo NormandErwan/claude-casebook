@@ -29,23 +29,23 @@ earn its place.
 ## A/B test a `CLAUDE.md` rule or a skill
 
 `claude plugin eval` isolates every run, grades it and records its cost, but it never loads a
-`CLAUDE.md` and only compares a plugin with no plugin. `test-rule-change` ships scripts that
-fill the gap: each arm becomes a plugin whose `SessionStart` hook prints that arm's `CLAUDE.md`,
+`CLAUDE.md` and only compares a plugin with no plugin. `test-rule-change` ships `ab.py`
+to fill the gap: each arm becomes a plugin whose `SessionStart` hook prints that arm's `CLAUDE.md`,
 next to the skills under test.
 
 ```bash
-S=plugins/casebook/skills/test-rule-change/scripts
-cp old.md new.md && python3 $S/edit-once.py new.md "- old rule" "- new rule"  # one checked edit
-bash $S/build-arm.sh --out arms/old --claude-md old.md --skills skills/ --evals evals/
-bash $S/build-arm.sh --out arms/new --claude-md new.md --skills skills/ --evals evals/
-bash $S/diff-arms.sh arms/old arms/new hooks/claude-md.txt    # arms differ only there
-python3 $S/preflight.py arms/new case-1 --model claude-haiku-5-5 --scaffold   # free checks + 1-run pilot
-bash $S/run-arm.sh arms/old out/old.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
-bash $S/run-arm.sh arms/new out/new.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
-python3 $S/compare.py out/compare.md out/old.json out/new.json   # passes/runs per case and arm
+AB="python3 plugins/casebook/skills/test-rule-change/scripts/ab.py"
+cp old.md new.md && $AB edit new.md "- old rule" "- new rule"   # one checked edit
+$AB build --out arms/old --claude-md old.md --skills skills/ --evals evals/
+$AB build --out arms/new --claude-md new.md --skills skills/ --evals evals/
+$AB diff arms/old arms/new hooks/claude-md.txt    # arms differ only there
+$AB preflight arms/new case-1 --model claude-haiku-5-5 --scaffold   # free checks + 1-run pilot
+$AB run arms/old out/old.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
+$AB run arms/new out/new.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
+$AB compare out/compare.md out/old.json out/new.json   # passes/runs per case and arm
 ```
 
-Each script refuses a known way to waste a run: an edit that matches twice, arms that differ
+Each subcommand refuses a known way to waste a run: an edit that matches twice, arms that differ
 elsewhere, a tool not granted, a red fixture, a rule that never reached the session, a result
 overwritten. First use: two `backlog` versions on 15 trigger cases, 90 Haiku runs in about five
 minutes, $0.42, every check passed before the first scored run. Details and limits: the skill's

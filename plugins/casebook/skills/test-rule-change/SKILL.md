@@ -49,21 +49,21 @@ Run the steps in this order:
 
 ## Scripts
 
-`scripts/` runs steps 2-6 with `claude plugin eval`, for a `CLAUDE.md` rule or a skill.
-`plugin eval` never loads a `CLAUDE.md`, so an arm is a plugin dir whose `SessionStart` hook
-prints that arm's `CLAUDE.md`.
+`scripts/ab.py` (Python 3, stdlib only) runs steps 2-6 with `claude plugin eval`, for a
+`CLAUDE.md` rule or a skill. `plugin eval` never loads a `CLAUDE.md`, so an arm is a plugin dir
+whose `SessionStart` hook prints that arm's `CLAUDE.md`.
 
 | Step | Command | Refuses |
 |---|---|---|
-| 2 | `edit-once.py FILE OLD NEW`: derive the treatment text from the baseline | OLD matching 0 or 2+ times |
-| 2 | `build-arm.sh --out arms/<name> --claude-md FILE --skills DIR --evals DIR` | an existing `--out` |
-| 3 | `diff-arms.sh arms/<a> arms/<b> <path>...` | identical arms; any difference outside the named paths |
-| 4 | `preflight.py arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial. Warns on a call to an ungranted tool |
-| 5 | `run-arm.sh arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X`: also writes `<name>.runs.jsonl` (skills, tools, files written, denials, ungranted calls per run) | an existing result file; no cost cap |
-| 6 | `compare.py <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
+| 2 | `ab.py edit FILE OLD NEW`: derive the treatment text from the baseline | OLD matching 0 or 2+ times |
+| 2 | `ab.py build --out arms/<name> --claude-md FILE --skills DIR --evals DIR` | an existing `--out` |
+| 3 | `ab.py diff arms/<a> arms/<b> <path>...` | identical arms; any difference outside the named paths |
+| 4 | `ab.py preflight arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial. Warns on a call to an ungranted tool |
+| 5 | `ab.py run arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X`: also writes `<name>.runs.jsonl` (skills, tools, files written, denials, ungranted calls per run) | an existing result file; no cost cap |
+| 6 | `ab.py compare <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
 
-- Run every arm with the same case flags, model and runs. `scripts/test.sh` self-tests the
-  scripts at no cost.
+- Run every arm with the same case flags, model and runs. `python3 -m unittest discover -s
+  scripts` self-tests `ab.py` at no cost.
 - A tool without an `--allow-tools` grant is removed, not denied: the call fails as "No such
   tool available". Read the "ungranted tool" column of the comparison before trusting a score.
 - Graders are not checked: run a new grader once by hand on a known pass and a known fail.
@@ -82,6 +82,6 @@ prints that arm's `CLAUDE.md`.
 | Testing before review | Review, then test the reviewed text |
 | Trigger prompt ambiguous while an always-on rule asks to interview | Make the prompt unambiguous, unless the interview is what is tested |
 | "Must not fire" set ignores skills every arm shares | Derive each case's allowed skills from the rules all arms keep |
-| Arm built by regex or by hand | `edit-once.py`, then `diff-arms.sh` |
+| Arm built by regex or by hand | `ab.py edit`, then `ab.py diff` |
 
 See [`METHOD.md`](https://github.com/NormandErwan/claude-casebook/blob/main/METHOD.md) for why each step exists.
