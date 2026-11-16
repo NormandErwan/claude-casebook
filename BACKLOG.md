@@ -126,3 +126,13 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 - **Done when:**
   - [ ] every kept finding filed as a row in `casebook/retrospective.md`
   - [ ] this task's due date moved three months on, rather than the task deleted
+
+### Decide where research and eval results live
+- **Status:** needs owner: inside the skill dir, at the repository root, or in a plugin-level folder
+- **Context:** interim: `test-rule-change`'s research and results sit in its skill dir,
+  `research/` (owner, 2026-11-16), so they ship with each install (about 150 KB, no context cost).
+  `docs/research/` holds one root-level note; `EVALS.md` keeps cases in `plugins/<name>/evals/`.
+- **Next:** list each kind of file (research note, eval cases, run results JSON, comparison table) and ask the owner where each goes, with the install size of each option.
+- **Done when:**
+  - [ ] the rule written in `CLAUDE.md` "Layout"
+  - [ ] existing research and result files moved to match it, and links updated

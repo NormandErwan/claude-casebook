@@ -1,6 +1,6 @@
 ---
 name: test-rule-change
-version: 0.5.0
+version: 0.6.0
 description: Use before merging a change to a rule that applies in every session (a CLAUDE.md
   rule, a SessionStart hook's text, a skill description) or to a rule that gates a push, a pull
   request or a deletion; also when about to claim that a rule change works, or when a reviewer
@@ -47,6 +47,31 @@ Run the steps in this order:
 6. **Record** the measure, the result and the cost in the commit message and in the rule's
    `provenance.md` row.
 
+## Scripts
+
+`scripts/test-rule-change.py` (Python 3, stdlib only) runs steps 2-6 with `claude plugin eval`,
+for a `CLAUDE.md` rule or a skill. `plugin eval` never loads a `CLAUDE.md`, so an arm is a plugin
+dir whose `SessionStart` hook prints that arm's `CLAUDE.md`.
+
+| Step | Command | Refuses |
+|---|---|---|
+| 2 | `test-rule-change.py edit FILE OLD NEW`: derive the treatment text from the baseline | OLD matching 0 or 2+ times |
+| 2 | `test-rule-change.py build --out arms/<name> --claude-md FILE --skills DIR --evals DIR` | an existing `--out` |
+| 3 | `test-rule-change.py diff arms/<a> arms/<b> <path>...` | identical arms; any difference outside the named paths |
+| 4 | `test-rule-change.py preflight arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial. Warns on a call to an ungranted tool |
+| 5 | `test-rule-change.py run arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X`: also writes `<name>.runs.jsonl` (skills, tools, files written, denials, ungranted calls per run) | an existing result file; no cost cap |
+| 6 | `test-rule-change.py compare <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
+
+- Run every arm with the same case flags, model and runs. `test-rule-change.py` self-tests at no
+  cost, from the repo root: `python3 -m unittest discover -s
+  plugins/casebook/skills/test-rule-change/scripts`.
+- A tool without an `--allow-tools` grant is removed, not denied: the call fails as "No such
+  tool available". Read the "ungranted tool" column of the comparison before trusting a score.
+- Graders are not checked: run a new grader once by hand on a known pass and a known fail.
+- A hook-injected `CLAUDE.md` reproduced one arm of a known Haiku trigger test (19/30 vs 20/30)
+  and fell short on the other (17/30 vs 23/30). For a gap of a few runs, raise `--runs`.
+  Testing the framing of a real `CLAUDE.md` itself needs headless `claude -p` instead.
+
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -56,5 +81,8 @@ Run the steps in this order:
 | Baseline never fails | The eval does not measure the change: fix it before scoring |
 | Result kept only in the chat | Commit message + `provenance.md` row |
 | Testing before review | Review, then test the reviewed text |
+| Trigger prompt ambiguous while an always-on rule asks to interview | Make the prompt unambiguous, unless the interview is what is tested |
+| "Must not fire" set ignores skills every arm shares | Derive each case's allowed skills from the rules all arms keep |
+| Arm built by regex or by hand | `test-rule-change.py edit`, then `test-rule-change.py diff` |
 
 See [`METHOD.md`](https://github.com/NormandErwan/claude-casebook/blob/main/METHOD.md) for why each step exists.
