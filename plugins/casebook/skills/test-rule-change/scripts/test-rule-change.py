@@ -7,18 +7,18 @@ skills (roster name `<arm>:<skill>`). Each subcommand refuses a known way to
 waste a paid run.
 
 usage:
-  ab.py edit FILE OLD NEW
+  test-rule-change.py edit FILE OLD NEW
       replace OLD by NEW only if OLD occurs exactly once ("@path" reads a file)
-  ab.py build --out DIR [--claude-md FILE] [--skills DIR]... [--evals DIR]
+  test-rule-change.py build --out DIR [--claude-md FILE] [--skills DIR]... [--evals DIR]
       new arm dir; name = basename of DIR; later --skills wins
-  ab.py diff ARM_A ARM_B PATH...
+  test-rule-change.py diff ARM_A ARM_B PATH...
       arms must differ, and only under the named arm-relative paths
       (ignores .claude-plugin/plugin.json and evals/results/)
-  ab.py preflight ARM CASE [plugin eval flags...]
+  test-rule-change.py preflight ARM CASE [plugin eval flags...]
       free checks, then a 1-run pilot of CASE; not --runs/--case/--max-cost-usd
-  ab.py run ARM OUT.json [plugin eval flags...]
+  test-rule-change.py run ARM OUT.json [plugin eval flags...]
       scored run with fixed flags; also writes OUT.runs.jsonl
-  ab.py compare OUT.md A.json B.json [C.json...]
+  test-rule-change.py compare OUT.md A.json B.json [C.json...]
       passes/runs per case, grader and arm, then per-arm totals
 """
 import filecmp
@@ -45,7 +45,7 @@ IGNORED = (".claude-plugin/plugin.json", "evals/results")
 
 
 def die(cmd, msg):
-    sys.exit(f"ab {cmd}: {msg}")
+    sys.exit(f"test-rule-change {cmd}: {msg}")
 
 
 def usage():
@@ -78,7 +78,7 @@ def edit(args):
         die("edit", f"{path}: expected 1 match, found {n}: {old[:60]!r}")
     with open(path, "w", encoding="utf-8") as f:
         f.write(text.replace(old, new))
-    print(f"ab edit: {path}: 1 edit")
+    print(f"test-rule-change edit: {path}: 1 edit")
 
 
 # build
@@ -174,7 +174,7 @@ def diff(args):
             bad = True
     if bad:
         die("diff", f"arms differ outside {' '.join(allowed)}")
-    print(f"ab diff: differ only in: {' '.join(allowed)}")
+    print(f"test-rule-change diff: differ only in: {' '.join(allowed)}")
 
 
 # summarize: per-run audit line from a kept trace.
@@ -249,7 +249,7 @@ def write_summaries(src):
                     f.write(json.dumps(row, ensure_ascii=False) + "\n")
                     n += 1
     removed = sum(remove_kept(d) for d in kept)
-    print(f"ab run: {n} runs -> {out}; {removed} temp dirs removed")
+    print(f"test-rule-change run: {n} runs -> {out}; {removed} temp dirs removed")
 
 
 # preflight
@@ -260,11 +260,11 @@ def eval_cmd(arm, flags, extra):
 
 
 def fail(msg):
-    sys.exit(f"ab preflight: FAIL {msg}")
+    sys.exit(f"test-rule-change preflight: FAIL {msg}")
 
 
 def ok(msg):
-    print(f"ab preflight: ok   {msg}")
+    print(f"test-rule-change preflight: ok   {msg}")
 
 
 def check_sandbox(flags):
@@ -367,9 +367,9 @@ def check_pilot(arm, case, flags):
         fail(f"permission denials: {use['denials']}")
     ok("no permission denial")
     if use["ungranted"]:
-        print(f"ab preflight: WARN pilot called ungranted tools {sorted(set(use['ungranted']))}: "
+        print(f"test-rule-change preflight: WARN pilot called ungranted tools {sorted(set(use['ungranted']))}: "
               "grant them, or confirm the case does not need them")
-    print(f"ab preflight: pilot cost ${run['costUsd']:.4f}; skills called: {use['skills']}")
+    print(f"test-rule-change preflight: pilot cost ${run['costUsd']:.4f}; skills called: {use['skills']}")
 
 
 def preflight(args):
@@ -383,7 +383,7 @@ def preflight(args):
     check_scaffolds(arm)
     check_load(arm, flags)
     check_pilot(arm, case, flags)
-    print("ab preflight: all checks passed")
+    print("test-rule-change preflight: all checks passed")
 
 
 # run: fixed flags so every arm of a batch runs alike.
@@ -475,7 +475,7 @@ def compare(args):
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"ab compare: wrote {out}")
+    print(f"test-rule-change compare: wrote {out}")
 
 
 COMMANDS = {"edit": edit, "build": build, "diff": diff, "preflight": preflight,

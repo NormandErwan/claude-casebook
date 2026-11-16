@@ -29,20 +29,20 @@ earn its place.
 ## A/B test a `CLAUDE.md` rule or a skill
 
 `claude plugin eval` isolates every run, grades it and records its cost, but it never loads a
-`CLAUDE.md` and only compares a plugin with no plugin. `test-rule-change` ships `ab.py`
-to fill the gap: each arm becomes a plugin whose `SessionStart` hook prints that arm's `CLAUDE.md`,
-next to the skills under test.
+`CLAUDE.md` and only compares a plugin with no plugin. `test-rule-change` ships
+`test-rule-change.py` to fill the gap: each arm becomes a plugin whose `SessionStart` hook
+prints that arm's `CLAUDE.md`, next to the skills under test.
 
 ```bash
-AB="python3 plugins/casebook/skills/test-rule-change/scripts/ab.py"
-cp old.md new.md && $AB edit new.md "- old rule" "- new rule"   # one checked edit
-$AB build --out arms/old --claude-md old.md --skills skills/ --evals evals/
-$AB build --out arms/new --claude-md new.md --skills skills/ --evals evals/
-$AB diff arms/old arms/new hooks/claude-md.txt    # arms differ only there
-$AB preflight arms/new case-1 --model claude-haiku-5-5 --scaffold   # free checks + 1-run pilot
-$AB run arms/old out/old.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
-$AB run arms/new out/new.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
-$AB compare out/compare.md out/old.json out/new.json   # passes/runs per case and arm
+T="python3 plugins/casebook/skills/test-rule-change/scripts/test-rule-change.py"
+cp old.md new.md && $T edit new.md "- old rule" "- new rule"   # one checked edit
+$T build --out arms/old --claude-md old.md --skills skills/ --evals evals/
+$T build --out arms/new --claude-md new.md --skills skills/ --evals evals/
+$T diff arms/old arms/new hooks/claude-md.txt    # arms differ only there
+$T preflight arms/new case-1 --model claude-haiku-5-5 --scaffold   # free checks + 1-run pilot
+$T run arms/old out/old.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
+$T run arms/new out/new.json --model claude-haiku-5-5 --scaffold --runs 3 --max-cost-usd 2
+$T compare out/compare.md out/old.json out/new.json   # passes/runs per case and arm
 ```
 
 Each subcommand refuses a known way to waste a run: an edit that matches twice, arms that differ

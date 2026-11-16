@@ -1,7 +1,8 @@
-"""Free self-test of ab.py (no model call; `claude` is a stub on PATH).
+"""Free self-test of test-rule-change.py (no model call; `claude` is a stub on PATH).
 
 Run: python3 -m unittest discover -s plugins/casebook/skills/test-rule-change/scripts
 """
+import importlib.util
 import json
 import os
 import shutil
@@ -11,9 +12,11 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-AB = os.path.join(HERE, "ab.py")
-sys.path.insert(0, HERE)
-import ab  # noqa: E402
+CLI = os.path.join(HERE, "test-rule-change.py")
+# Hyphenated name: not importable by `import`.
+_spec = importlib.util.spec_from_file_location("test_rule_change", CLI)
+cli = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(cli)
 
 # Stub `claude`: logs its args. With `--json OUT` it writes a result whose one
 # run points at a trace in a new $TMPDIR/<STUB_PREFIX>* dir; the trace is
@@ -74,7 +77,7 @@ class Base(unittest.TestCase):
         write(os.path.join(self.bin, "claude"), STUB)
         os.chmod(os.path.join(self.bin, "claude"), 0o755)
         self.log = self.p("claude.log")
-        self.tmp = self.p("tmp")  # TMPDIR of ab.py and the stub
+        self.tmp = self.p("tmp")  # TMPDIR of the CLI and the stub
         os.makedirs(self.tmp)
         self.env = dict(os.environ, PATH=self.bin + os.pathsep + os.environ.get("PATH", ""),
                         STUB_LOG=self.log, TMPDIR=self.tmp)
@@ -86,17 +89,17 @@ class Base(unittest.TestCase):
     def p(self, rel):
         return os.path.join(self.t, rel)
 
-    def ab(self, *args, **env):
-        return subprocess.run([sys.executable, AB, *args], env=dict(self.env, **env),
+    def cli(self, *args, **env):
+        return subprocess.run([sys.executable, CLI, *args], env=dict(self.env, **env),
                               capture_output=True, text=True, stdin=subprocess.DEVNULL)
 
     def ok(self, *args, **env):
-        r = self.ab(*args, **env)
+        r = self.cli(*args, **env)
         self.assertEqual(r.returncode, 0, f"{args}: {r.stdout}{r.stderr}")
         return r
 
     def refused(self, *args, **env):
-        r = self.ab(*args, **env)
+        r = self.cli(*args, **env)
         self.assertNotEqual(r.returncode, 0, f"should fail: {args}: {r.stdout}")
         return r
 
@@ -113,7 +116,7 @@ class Base(unittest.TestCase):
 class AbTest(Base):
     def test_help(self):
         for args in (["-h"], ["build", "--help"], ["run", "x", "y", "-h"]):
-            r = self.ab(*args)
+            r = self.cli(*args)
             self.assertEqual(r.returncode, 0, args)
             self.assertIn("usage:", r.stdout)
         self.assertEqual(self.claude_calls(), [])
@@ -124,7 +127,7 @@ class AbTest(Base):
         self.build("a-base")
         self.assertTrue(os.path.isfile(self.p("a-base/skills/alpha/SKILL.md")))
         hook = read(self.p("a-base/hooks/claude-md.txt"))
-        self.assertEqual(hook, ab.HEADER + read(self.p("base.md")))
+        self.assertEqual(hook, cli.HEADER + read(self.p("base.md")))
         self.assertIn('"name": "a-base"', read(self.p("a-base/.claude-plugin/plugin.json")))
         hooks = json.loads(read(self.p("a-base/hooks/hooks.json")))
         cmd = hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"]
@@ -212,7 +215,7 @@ class AbTest(Base):
     def test_run_flags_summary_cleanup(self):
         self.build("a-base")
         out = self.p("batch/a-base.json")
-        r = self.ab("run", self.p("a-base"), out, "--allow-tools", "Write", "Edit",
+        r = self.cli("run", self.p("a-base"), out, "--allow-tools", "Write", "Edit",
                     "--max-cost-usd", "2", STUB_RC="3")
         self.assertEqual(r.returncode, 3, r.stderr)  # plugin eval's code
         (args,) = self.claude_calls()
@@ -297,7 +300,7 @@ class PreflightTest(Base):
         return path
 
     def preflight(self, *flags, events=None, **env):
-        return self.ab("preflight", self.arm, "c1", *flags,
+        return self.cli("preflight", self.arm, "c1", *flags,
                        STUB_EVENTS=events or self.events(), **env)
 
     def assert_fails(self, r, text):
@@ -378,7 +381,7 @@ class SummarizeTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as f:
             f.write("".join(json.dumps(e) + "\n" for e in events))
         self.addCleanup(os.remove, f.name)
-        s = ab.summarize(f.name)
+        s = cli.summarize(f.name)
         self.assertEqual(s["skills"], ["a:alpha"])
         self.assertEqual(s["tools"], ["Skill", "Write", "Bash", "Bash", "WebFetch"])
         self.assertEqual(s["files"], ["/w/a.md"])
@@ -390,9 +393,9 @@ class SummarizeTest(unittest.TestCase):
         writes = ["a >> f", "sed -i s/a/b/ f", "x | tee f", "mv a b", "cp a b"]
         reads = ["ls 2>&1", "cat f", "grep -n x f"]
         for c in writes:
-            self.assertTrue(ab.BASH_WRITE.search(c), c)
+            self.assertTrue(cli.BASH_WRITE.search(c), c)
         for c in reads:
-            self.assertFalse(ab.BASH_WRITE.search(c), c)
+            self.assertFalse(cli.BASH_WRITE.search(c), c)
 
     def test_remove_kept_only_eval_dirs_in_tempdir(self):
         tmp = tempfile.gettempdir()
@@ -403,10 +406,10 @@ class SummarizeTest(unittest.TestCase):
         os.makedirs(inner)
         self.addCleanup(shutil.rmtree, nested, True)
         self.addCleanup(shutil.rmtree, other, True)
-        self.assertTrue(ab.remove_kept(os.path.join(tmp, os.path.basename(eval_dir))))
+        self.assertTrue(cli.remove_kept(os.path.join(tmp, os.path.basename(eval_dir))))
         self.assertFalse(os.path.exists(eval_dir))
-        self.assertFalse(ab.remove_kept(inner))
-        self.assertFalse(ab.remove_kept(other))
+        self.assertFalse(cli.remove_kept(inner))
+        self.assertFalse(cli.remove_kept(other))
         self.assertTrue(os.path.isdir(inner) and os.path.isdir(other))
 
 
