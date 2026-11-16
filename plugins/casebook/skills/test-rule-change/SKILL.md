@@ -1,6 +1,6 @@
 ---
 name: test-rule-change
-version: 0.5.0
+version: 0.6.0
 description: Use before merging a change to a rule that applies in every session (a CLAUDE.md
   rule, a SessionStart hook's text, a skill description) or to a rule that gates a push, a pull
   request or a deletion; also when about to claim that a rule change works, or when a reviewer
@@ -47,6 +47,27 @@ Run the steps in this order:
 6. **Record** the measure, the result and the cost in the commit message and in the rule's
    `provenance.md` row.
 
+## Scripts
+
+`scripts/` runs steps 2-6 with `claude plugin eval`, for a `CLAUDE.md` rule or a skill.
+`plugin eval` never loads a `CLAUDE.md`, so an arm is a plugin dir whose `SessionStart` hook
+prints that arm's `CLAUDE.md`.
+
+| Step | Command | Refuses |
+|---|---|---|
+| 2 | `edit-once.py FILE OLD NEW`: derive the treatment text from the baseline | OLD matching 0 or 2+ times |
+| 2 | `build-arm.sh --out arms/<name> --claude-md FILE --skills DIR --evals DIR` | an existing `--out` |
+| 3 | `diff-arms.sh arms/<a> arms/<b> <path>...` | identical arms; any difference outside the named paths |
+| 4 | `preflight.py arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial |
+| 5 | `run-arm.sh arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X` | an existing result file; no cost cap |
+| 6 | `compare.py <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
+
+- Run every arm with the same case flags, model and runs. `scripts/test.sh` self-tests the
+  scripts at no cost.
+- A hook-injected `CLAUDE.md` reproduced one arm of a known Haiku trigger test (19/30 vs 20/30)
+  and fell short on the other (17/30 vs 23/30). For a gap of a few runs, raise `--runs`.
+  Testing the framing of a real `CLAUDE.md` itself needs headless `claude -p` instead.
+
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -56,5 +77,8 @@ Run the steps in this order:
 | Baseline never fails | The eval does not measure the change: fix it before scoring |
 | Result kept only in the chat | Commit message + `provenance.md` row |
 | Testing before review | Review, then test the reviewed text |
+| Trigger prompt ambiguous while an always-on rule asks to interview | Make the prompt unambiguous, unless the interview is what is tested |
+| "Must not fire" set ignores skills every arm shares | Derive each case's allowed skills from the rules all arms keep |
+| Arm built by regex or by hand | `edit-once.py`, then `diff-arms.sh` |
 
 See [`METHOD.md`](https://github.com/NormandErwan/claude-casebook/blob/main/METHOD.md) for why each step exists.
