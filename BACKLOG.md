@@ -129,7 +129,9 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 
 ### Decide where research and eval results live
 - **Status:** needs owner: inside the skill dir, at the repository root, or in a plugin-level folder
-- **Context:** `test-rule-change`'s research and calibration results were copied (2026-11-16) into `plugins/casebook/skills/test-rule-change/research/` beside the skill, at the owner's request, pending this decision. Anything in a skill or plugin dir ships with each install (this folder: about 150 KB, mostly result JSON; no context cost, only `SKILL.md` loads). `docs/research/` already holds one root-level note (`2026-11-02--instruction-maintenance.md`); `EVALS.md` points to `plugins/<name>/evals/` for cases and to `casebook/provenance.md` for results. NormandErwan/Claude keeps its originals in `docs/research/` and `docs/evidence/`.
+- **Context:** interim: `test-rule-change`'s research and results sit in its skill dir,
+  `research/` (owner, 2026-11-16), so they ship with each install (about 150 KB, no context cost).
+  `docs/research/` holds one root-level note; `EVALS.md` keeps cases in `plugins/<name>/evals/`.
 - **Next:** list each kind of file (research note, eval cases, run results JSON, comparison table) and ask the owner where each goes, with the install size of each option.
 - **Done when:**
   - [ ] the rule written in `CLAUDE.md` "Layout"
