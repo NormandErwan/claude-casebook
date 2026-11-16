@@ -127,9 +127,10 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - [ ] every kept finding filed as a row in `casebook/retrospective.md`
   - [ ] this task's due date moved three months on, rather than the task deleted
 
-### Decide whether test-rule-change becomes test-change
-- **Status:** needs owner: keep `test-rule-change`, or rename (to `test-change` or another name)
-- **Context:** owner asked (2026-11-16) whether `test-change` fits better now that `scripts/` A/B-tests skills as well as `CLAUDE.md` rules. Against it: "change" alone also names code changes, so the name `casebook:test-change` can pull the skill into "test my change" requests that belong to TDD skills; "rule" is the noun `METHOD.md` ("Testing a rule change") and the description already cover, and a skill description counts as a rule there. Cost: 11 files here and 5 in NormandErwan/Claude name it; a renamed skill breaks installs that call it by name (major bump under `write-skill` semver, unverified). Recommendation: keep the name, and add "or a skill's body" to the description if skills are under-covered.
-- **Next:** ask the owner which option.
+### Decide where research and eval results live
+- **Status:** needs owner: inside the skill dir, at the repository root, or in a plugin-level folder
+- **Context:** `test-rule-change`'s research and calibration results were copied (2026-11-16) into `plugins/casebook/skills/test-rule-change/research/` beside the skill, at the owner's request, pending this decision. Anything in a skill or plugin dir ships with each install (this folder: about 150 KB, mostly result JSON; no context cost, only `SKILL.md` loads). `docs/research/` already holds one root-level note (`2026-11-02--instruction-maintenance.md`); `EVALS.md` points to `plugins/<name>/evals/` for cases and to `casebook/provenance.md` for results. NormandErwan/Claude keeps its originals in `docs/research/` and `docs/evidence/`.
+- **Next:** list each kind of file (research note, eval cases, run results JSON, comparison table) and ask the owner where each goes, with the install size of each option.
 - **Done when:**
-  - [ ] option recorded in `casebook/provenance.md`; if renamed, no file names `test-rule-change` except ledger history
+  - [ ] the rule written in `CLAUDE.md` "Layout"
+  - [ ] existing research and result files moved to match it, and links updated
