@@ -62,8 +62,9 @@ dir whose `SessionStart` hook prints that arm's `CLAUDE.md`.
 | 5 | `test-rule-change.py run arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X`: also writes `<name>.runs.jsonl` (skills, tools, files written, denials, ungranted calls per run) | an existing result file; no cost cap |
 | 6 | `test-rule-change.py compare <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
 
-- Run every arm with the same case flags, model and runs. `python3 -m unittest discover -s
-  scripts` self-tests `test-rule-change.py` at no cost.
+- Run every arm with the same case flags, model and runs. `test-rule-change.py` self-tests at no
+  cost, from the repo root: `python3 -m unittest discover -s
+  plugins/casebook/skills/test-rule-change/scripts`.
 - A tool without an `--allow-tools` grant is removed, not denied: the call fails as "No such
   tool available". Read the "ungranted tool" column of the comparison before trusting a score.
 - Graders are not checked: run a new grader once by hand on a known pass and a known fail.

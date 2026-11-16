@@ -274,6 +274,42 @@ class AbTest(Base):
         self.assertIn("| new | 3 | 0 | n/a | 0.00 |", table)
 
 
+    def test_compare_refuses_duplicate_label(self):
+        os.makedirs(self.p("out1"))
+        os.makedirs(self.p("out2"))
+        result(self.p("out1/new.json"), [1])
+        result(self.p("out2/new.json"), [2])
+        r = self.refused("compare", self.p("cmp.md"), self.p("out1/new.json"), self.p("out2/new.json"))
+        self.assertIn("same arm label", r.stderr)
+        self.assertFalse(os.path.exists(self.p("cmp.md")))
+
+    def test_compare_errored_run_counts_as_fail(self):
+        result(self.p("old.json"), [1])
+        result(self.p("new.json"), [2])
+        d = json.loads(read(self.p("new.json")))
+        d["cases"][0]["arms"]["with"][0].update(graders=[], error="boom", score=0.0)
+        write(self.p("new.json"), json.dumps(d))
+        self.ok("compare", self.p("cmp.md"), self.p("old.json"), self.p("new.json"))
+        table = read(self.p("cmp.md"))
+        self.assertIn("| c0 | fired | 1/3 | 1/3 |", table)
+        self.assertIn("| new | 3 | 1 |", table)
+
+    def test_compare_reads_summary_of_any_result_name(self):
+        result(self.p("old.json"), [1])
+        result(self.p("new.result"), [1])
+        write(self.p("new.result.runs.jsonl"), json.dumps({"denials": ["Bash"]}) + "\n")
+        self.ok("compare", self.p("cmp.md"), self.p("old.json"), self.p("new.result"))
+        self.assertIn("| new | 3 | 0 | 1 |", read(self.p("cmp.md")))
+
+    def test_skill_md_test_command_from_repo_root(self):
+        root = os.path.abspath(os.path.join(HERE, *[".."] * 5))
+        rel = os.path.relpath(HERE, root)
+        skill = read(os.path.join(HERE, "..", "SKILL.md"))
+        self.assertIn(f"python3 -m unittest discover -s {rel}", " ".join(skill.split()))
+        self.assertTrue(os.path.isdir(os.path.join(root, ".git")) or os.path.isfile(
+            os.path.join(root, "README.md")), root)
+
+
 class PreflightTest(Base):
     def setUp(self):
         super().setUp()
@@ -360,6 +396,21 @@ class PreflightTest(Base):
         self.assertIn("WARN pilot called ungranted tools ['WebFetch']", r.stdout)
 
 
+    def test_missing_scaffold_script(self):
+        write(self.p("a-base/evals/c1/case.yaml"),
+              'name: "c1"\nscaffold_script: setup.sh  # builds the fixture\n')
+        self.assert_fails(self.preflight(), "setup.sh named in case.yaml does not exist")
+        self.assertEqual(self.claude_calls(), [])
+
+    def test_bash_grant_by_token(self):
+        # "Bash" outside an --allow-tools value is no grant: no sandbox needed.
+        r = self.preflight("--allow-tools", "BashOutput", "--model", "Bash", PATH=self.bin)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("no Bash grant", r.stdout)
+        r = self.preflight("--allow-tools", "Write", "Bash(git:*)", PATH=self.bin)
+        self.assert_fails(r, "Bash granted")
+
+
 class SummarizeTest(unittest.TestCase):
     def test_trace(self):
         events = [
@@ -397,6 +448,21 @@ class SummarizeTest(unittest.TestCase):
         for c in reads:
             self.assertFalse(cli.BASH_WRITE.search(c), c)
 
+    def test_scaffold_script_parse(self):
+        cases = {'scaffold_script: setup.sh\n': "setup.sh",
+                 'scaffold_script: "s p.sh"  # quoted\n': "s p.sh",
+                 "scaffold_script: 'a#b.sh'\n": "a#b.sh",
+                 'scaffold_script: setup.sh   # comment\n': "setup.sh",
+                 'name: x\n': None}
+        for text, want in cases.items():
+            self.assertEqual(cli.scaffold_script(text), want, text)
+
+    def test_granted(self):
+        self.assertEqual(cli.granted(["--model", "m", "--allow-tools", "Write", "Bash", "--runs", "3"]),
+                         ["Write", "Bash"])
+        self.assertEqual(cli.granted(["--allow-tools=Read,Bash(git:*)"]), ["Read", "Bash(git:*)"])
+        self.assertEqual(cli.granted(["--model", "Bash"]), [])
+
     def test_remove_kept_only_eval_dirs_in_tempdir(self):
         tmp = tempfile.gettempdir()
         eval_dir = tempfile.mkdtemp(prefix="claude-eval-")
@@ -404,6 +470,9 @@ class SummarizeTest(unittest.TestCase):
         inner = os.path.join(nested, "claude-eval-x")
         other = tempfile.mkdtemp(prefix="keep-")
         os.makedirs(inner)
+        os.makedirs(os.path.join(eval_dir, "ro"))
+        write(os.path.join(eval_dir, "ro", "f"), "x")
+        os.chmod(os.path.join(eval_dir, "ro"), 0o500)  # read-only tree still removed
         self.addCleanup(shutil.rmtree, nested, True)
         self.addCleanup(shutil.rmtree, other, True)
         self.assertTrue(cli.remove_kept(os.path.join(tmp, os.path.basename(eval_dir))))

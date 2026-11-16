@@ -219,7 +219,14 @@ def remove_kept(d):
     if (os.path.dirname(d) != os.path.realpath(tempfile.gettempdir())
             or not os.path.basename(d).startswith("claude-eval-")):
         return False
-    subprocess.run(["chmod", "-R", "u+rwX", d])
+    def writable(path):  # chmod u+rwX, so a read-only tree still goes
+        if not os.path.islink(path):
+            os.chmod(path, os.stat(path).st_mode | (0o700 if os.path.isdir(path) else 0o600))
+
+    writable(d)
+    for root, dirs, files in os.walk(d):
+        for n in dirs + files:
+            writable(os.path.join(root, n))
     shutil.rmtree(d, ignore_errors=True)
     return True
 
@@ -267,8 +274,21 @@ def ok(msg):
     print(f"test-rule-change preflight: ok   {msg}")
 
 
+def granted(flags):
+    """Tool names after --allow-tools (or --allow-tools=X), up to the next flag."""
+    tools, on = [], False
+    for f in flags:
+        if f.startswith("--allow-tools="):
+            tools += f.split("=", 1)[1].split(",")
+        elif f.startswith("-"):
+            on = f == "--allow-tools"
+        elif on:
+            tools += f.split(",")
+    return [t.strip() for t in tools]
+
+
 def check_sandbox(flags):
-    if "Bash" not in " ".join(flags):
+    if not any(t == "Bash" or t.startswith("Bash(") for t in granted(flags)):
         return ok("no Bash grant: sandbox not needed")
     missing = [b for b in ("bwrap", "socat") if not shutil.which(b)]
     if missing:
@@ -277,18 +297,31 @@ def check_sandbox(flags):
     ok("Bash sandbox backends present")
 
 
+def scaffold_script(yaml_text):
+    """scaffold_script value: quotes stripped, trailing `# comment` dropped."""
+    m = re.search(r"^\s*scaffold_script:[ \t]*(.*)$", yaml_text, re.M)
+    if not m:
+        return None
+    v = m.group(1).strip()
+    q = re.match(r"""(["'])(.*?)\1""", v)
+    return q.group(2) if q else re.sub(r"\s+#.*$", "", v).strip() or None
+
+
 def check_scaffolds(arm):
     n = 0
     for case_yaml in sorted(glob.glob(os.path.join(arm, "evals", "*", "case.yaml"))):
         case_dir = os.path.dirname(case_yaml)
         with open(case_yaml) as f:
-            m = re.search(r'scaffold_script:\s*"?([^"\n]+)"?', f.read())
-        if not m:
+            script = scaffold_script(f.read())
+        if not script:
             continue
+        scaffold = os.path.join(case_dir, script)
+        if not os.path.isfile(scaffold):
+            fail(f"{os.path.relpath(scaffold, arm)} named in case.yaml does not exist")
         with tempfile.TemporaryDirectory() as ws:
-            for step in (os.path.join(case_dir, m.group(1)), os.path.join(case_dir, "check.sh")):
+            for step in (scaffold, os.path.join(case_dir, "check.sh")):
                 if not os.path.exists(step):
-                    continue
+                    continue  # check.sh is optional
                 # plugin eval gives a scaffold PATH only: a tool found through
                 # another inherited var here would be missing in the run.
                 r = subprocess.run(["bash", os.path.abspath(step)], cwd=ws,
@@ -417,11 +450,10 @@ def load(path):
     cases = {}
     for c in d["cases"]:
         runs = c["arms"].get("with", [])
-        graders = {}
-        for r in runs:
-            for g in r.get("graders", []):
-                p, n = graders.get(g["name"], (0, 0))
-                graders[g["name"]] = (p + bool(g["passed"]), n + 1)
+        # Denominator = all runs: an errored run (no grader result) is a fail.
+        names = {g["name"] for r in runs for g in r.get("graders", [])}
+        graders = {g: (sum(any(x["name"] == g and x["passed"] for x in r.get("graders", []))
+                           for r in runs), len(runs)) for g in names}
         cases[c["name"]] = {"graders": graders, "runs": runs}
     return os.path.splitext(os.path.basename(path))[0], d, cases
 
@@ -435,6 +467,9 @@ def compare(args):
         die("compare", f"{out} exists: write a new file")
     arms = [load(p) for p in paths]
     labels = [a[0] for a in arms]
+    dup = sorted({l for l in labels if labels.count(l) > 1})
+    if dup:
+        die("compare", f"same arm label from two files: {dup}: rename one")
     names = sorted(set().union(*(a[2] for a in arms)))
     missing = [(l, n) for l, _, c in arms for n in names if n not in c]
     if missing:
@@ -464,7 +499,7 @@ def compare(args):
         scores = [r["score"] for r in runs if r.get("score") is not None]
         mean = sum(scores) / len(scores) if scores else 0
         # Denials live in the traces: read `run`'s summary when present.
-        summary = path[:-5] + ".runs.jsonl" if path.endswith(".json") else ""
+        summary = summary_path(path)
         denied = "n/a"
         if os.path.exists(summary):
             with open(summary) as f:
