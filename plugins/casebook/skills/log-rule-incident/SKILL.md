@@ -68,6 +68,17 @@ the same change (a commit cannot cite its own hash): date, section, rule, commit
      the entry stays `accepted`, `Landed in` `-`.
    - Not accepted -> `no change` / `closed`, with the reason.
 
+## Maintenance pass
+
+Some defects need no incident to exist: stale facts, dead references, contradictions between
+files, wording written for an older model. On each new model generation, and every three months:
+
+1. Run the audit (`/doctor prompt-audit`) on each plugin, then on the whole repository: each
+   scope finds defects the other misses.
+2. Each finding kept enters `retrospective.md` as a row, then goes through processing like any
+   incident.
+3. Note the date of the next pass in the repository's backlog.
+
 ## Common Mistakes
 
 | Mistake | Fix |

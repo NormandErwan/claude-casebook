@@ -27,4 +27,6 @@ another project.
 
 ## Releasing
 
+- A merge changes the version of a plugin listed in `.claude-plugin/marketplace.json` -> tag it
+  from `main` after the merge. Unlisted plugins are not tagged.
 - `claude plugin tag plugins/<name> --push` creates and pushes `<name>--v<version>`.
