@@ -41,8 +41,9 @@ Run the steps in this order:
    The treatment pilot must show the rule loaded.
 5. **Run** with `claude plugin eval <plugin>` (cases in the plugin's `evals/`; see
    `claude plugin eval --help` for the case format). Set `--max-cost-usd` for a paid run.
-   Count the agent runs first: each runs on your own credential and shares the session's rate
-   limit. Over ~100 runs, or late in a long session, launch from a fresh session.
+   Before launching, state the number of agent runs and that they share the session's rate
+   limit (each runs on your own credential): the owner decides whether to launch from a fresh
+   session.
 6. **Record** the measure, the result and the cost in the commit message and in the rule's
    `provenance.md` row.
 
