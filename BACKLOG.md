@@ -12,12 +12,12 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 ## Tasks
 
 ### Decide when plugins get tagged, then tag them
-- **Status:** needs owner: tag every merge that bumps a plugin's version, or only plugins listed in `.claude-plugin/marketplace.json`?
+- **Status:** owner steps pending
 - **Context:** `git tag -l` is empty: no plugin has ever been released, `write-prompt` and `backlog` included although the marketplace lists them. `CLAUDE.md` "Releasing" says how to tag, not when; `casebook/retrospective.md` row 2026-11-03 "A repository rule says how to release but not when" proposes the fix and is settled by this task.
-- **Next:** once the owner decides, extend `CLAUDE.md` "Releasing" with when to tag, and set that retrospective row to `applied` in the same PR.
+- **Next:** owner decided 2026-11-16: only marketplace-listed plugins (`CLAUDE.md` "Releasing", PR#10). After PR#10 merges, the owner runs the steps below; delete this task once both tags are on `origin`.
 - **Done when:**
-  - [ ] `CLAUDE.md` "Releasing" says when a plugin is tagged
-  - [ ] The retrospective row is `applied`, `Landed in` this PR
+  - [x] `CLAUDE.md` "Releasing" says when a plugin is tagged
+  - [x] The retrospective row is `applied`, `Landed in` PR#10
   - [ ] Every plugin the new rule covers has a `<name>--v<version>` tag on `origin`
 - **Owner steps:** after merge, from an up-to-date `main` checkout. Shown for the two listed plugins; add one step per other plugin the decision covers.
   1. Tag `write-prompt`: `claude plugin tag plugins/write-prompt --push`
@@ -118,3 +118,11 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - [ ] each table row confirmed or corrected, with the Claude Code version next to the date
   - [ ] `red-s2.md` disagreement resolved, plugin version bumped
   - [ ] the retrospective row reads `applied` with this PR
+
+### Run the first maintenance pass
+- **Status:** ready
+- **Context:** `log-rule-incident` "Maintenance pass" (PR#10): on each new model generation and every three months, `/doctor prompt-audit` per plugin, then on the repository; each finding kept becomes a `retrospective.md` row. The last audits ran 2026-11-03 (PR #5), so the next pass is due by 2027-02-03, or earlier if a new model generation ships.
+- **Next:** on the due date, run the audit on each plugin under `plugins/`, then on `.`.
+- **Done when:**
+  - [ ] every kept finding filed as a row in `casebook/retrospective.md`
+  - [ ] this task's due date moved three months on, rather than the task deleted
