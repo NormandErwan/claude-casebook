@@ -126,3 +126,10 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 - **Done when:**
   - [ ] every kept finding filed as a row in `casebook/retrospective.md`
   - [ ] this task's due date moved three months on, rather than the task deleted
+
+### Decide whether test-rule-change becomes test-change
+- **Status:** needs owner: keep `test-rule-change`, or rename (to `test-change` or another name)
+- **Context:** owner asked (2026-11-16) whether `test-change` fits better now that `scripts/` A/B-tests skills as well as `CLAUDE.md` rules. Against it: "change" alone also names code changes, so the name `casebook:test-change` can pull the skill into "test my change" requests that belong to TDD skills; "rule" is the noun `METHOD.md` ("Testing a rule change") and the description already cover, and a skill description counts as a rule there. Cost: 11 files here and 5 in NormandErwan/Claude name it; a renamed skill breaks installs that call it by name (major bump under `write-skill` semver, unverified). Recommendation: keep the name, and add "or a skill's body" to the description if skills are under-covered.
+- **Next:** ask the owner which option.
+- **Done when:**
+  - [ ] option recorded in `casebook/provenance.md`; if renamed, no file names `test-rule-change` except ledger history
