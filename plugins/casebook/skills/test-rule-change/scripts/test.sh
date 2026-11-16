@@ -34,6 +34,8 @@ expect_fail bash "$D/diff-arms.sh" "$T/a-base" "$T/a-new" skills
 rm -rf "$T/a-new/skills/beta"
 expect_fail bash "$D/diff-arms.sh" "$T/a-base" "$T/a-new" hooks/claude-md.txt
 expect_ok bash "$D/diff-arms.sh" "$T/a-base" "$T/a-new" hooks/claude-md.txt skills/beta
+cp -R "$T/a-base" "$T/a-base-2"; mkdir -p "$T/a-base-2/extra"; touch "$T/a-base-2/extra/g"
+expect_ok bash "$D/diff-arms.sh" "$T/a-base" "$T/a-base-2" extra   # name prefix of the other arm
 cp -R "$T/a-base" "$T/a-same"
 expect_fail bash "$D/diff-arms.sh" "$T/a-base" "$T/a-same" hooks
 

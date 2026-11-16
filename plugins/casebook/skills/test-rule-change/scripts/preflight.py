@@ -14,7 +14,7 @@ Checks, in order (all but the pilot are free):
      scaffold skipped, bad frontmatter)
   4. pilot, 1 run of CASE: the arm's CLAUDE.md text reached the session,
      every arm skill is in the roster, no foreign memory or extra dir
-     loaded, no permission denial
+     loaded, no permission denial; warns on calls to an ungranted tool
 """
 import glob
 import json
@@ -24,6 +24,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+summarize = __import__("summarize-runs").summarize
 
 
 def fail(msg):
@@ -97,6 +100,7 @@ def check_pilot(arm, case, flags):
         trace = run["tracePath"]
         try:
             events = [json.loads(l) for l in open(trace)]
+            use = summarize(trace)
         finally:
             keep = os.path.dirname(os.path.dirname(trace))
             if keep.startswith(tempfile.gettempdir()) and "claude-eval-" in keep:
@@ -130,10 +134,13 @@ def check_pilot(arm, case, flags):
             fail(f"foreign context loaded ({key}): {foreign}")
     ok("no foreign memory or extra dir")
 
-    denials = [d for e in events if e.get("type") == "result" for d in e.get("permission_denials", [])]
-    if denials:
-        fail(f"{len(denials)} permission denials: {json.dumps(denials)[:300]}")
-    ok(f"no permission denial; pilot cost ${run['costUsd']:.4f}")
+    if use["denials"]:
+        fail(f"permission denials: {use['denials']}")
+    ok("no permission denial")
+    if use["ungranted"]:
+        print(f"preflight: WARN pilot called ungranted tools {sorted(set(use['ungranted']))}: "
+              "grant them, or confirm the case does not need them")
+    print(f"preflight: pilot cost ${run['costUsd']:.4f}; skills called: {use['skills']}")
 
 
 def main():

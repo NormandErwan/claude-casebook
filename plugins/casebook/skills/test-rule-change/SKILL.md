@@ -58,12 +58,15 @@ prints that arm's `CLAUDE.md`.
 | 2 | `edit-once.py FILE OLD NEW`: derive the treatment text from the baseline | OLD matching 0 or 2+ times |
 | 2 | `build-arm.sh --out arms/<name> --claude-md FILE --skills DIR --evals DIR` | an existing `--out` |
 | 3 | `diff-arms.sh arms/<a> arms/<b> <path>...` | identical arms; any difference outside the named paths |
-| 4 | `preflight.py arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial |
-| 5 | `run-arm.sh arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X` | an existing result file; no cost cap |
+| 4 | `preflight.py arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial. Warns on a call to an ungranted tool |
+| 5 | `run-arm.sh arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X`: also writes `<name>.runs.jsonl` (skills, tools, files written, denials, ungranted calls per run) | an existing result file; no cost cap |
 | 6 | `compare.py <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
 
 - Run every arm with the same case flags, model and runs. `scripts/test.sh` self-tests the
   scripts at no cost.
+- A tool without an `--allow-tools` grant is removed, not denied: the call fails as "No such
+  tool available". Read the "ungranted tool" column of the comparison before trusting a score.
+- Graders are not checked: run a new grader once by hand on a known pass and a known fail.
 - A hook-injected `CLAUDE.md` reproduced one arm of a known Haiku trigger test (19/30 vs 20/30)
   and fell short on the other (17/30 vs 23/30). For a gap of a few runs, raise `--runs`.
   Testing the framing of a real `CLAUDE.md` itself needs headless `claude -p` instead.

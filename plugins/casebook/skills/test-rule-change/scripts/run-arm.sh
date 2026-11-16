@@ -7,7 +7,8 @@
 #          --model claude-haiku-5-5 --runs 3 --scaffold --allow-tools Write Edit \
 #          --max-cost-usd 2
 # Adds --ablation none (arm vs arm, compared by compare.py) unless --ablation
-# is given, plus --trust-plugin --no-publish --json OUT, stdin from /dev/null.
+# is given, plus --keep-temp --trust-plugin --no-publish --json OUT, stdin
+# from /dev/null; then summarize-runs.py writes OUT.runs.jsonl.
 set -euo pipefail
 
 [ $# -ge 2 ] || { echo "usage: run-arm.sh ARM OUT.json [flags...]" >&2; exit 2; }
@@ -20,4 +21,8 @@ flags=("$@")
 [[ " $* " == *" --ablation "* ]] || flags+=(--ablation none)
 [[ " $* " == *" --max-cost-usd "* ]] || { echo "run-arm: set --max-cost-usd for a paid run" >&2; exit 1; }
 
-claude plugin eval "$ARM" "${flags[@]}" --trust-plugin --no-publish --json "$OUT" </dev/null
+rc=0
+claude plugin eval "$ARM" "${flags[@]}" --keep-temp --trust-plugin --no-publish --json "$OUT" </dev/null || rc=$?
+# Per-run summary (skills, writes, denials) beside OUT; kept temp dirs removed.
+[ -f "$OUT" ] && python3 "$(dirname "$0")/summarize-runs.py" "$OUT"
+exit $rc

@@ -57,12 +57,19 @@ def main():
             lines.append(f"| {n} | {g} | " + " | ".join(cells) + " |")
     lines.append("| **all** | | " + " | ".join(f"**{p}/{k}**" for p, k in totals.values()) + " |")
 
-    lines += ["", "| Arm | Runs | Errors | Mean score | Cost (USD) |", "|---|---|---|---|---|"]
-    for l, d, c in arms:
+    lines += ["", "| Arm | Runs | Errors | Runs with a denial or ungranted tool | Mean score | Cost (USD) |",
+              "|---|---|---|---|---|---|"]
+    for (l, d, c), path in zip(arms, paths):
         runs = [r for v in c.values() for r in v["runs"]]
         errs = sum(1 for r in runs if r.get("error"))
         mean = sum(r["score"] for r in runs) / len(runs) if runs else 0
-        lines.append(f"| {l} | {len(runs)} | {errs} | {mean:.2f} | {d['costUsd']:.2f} |")
+        # Denials live in the traces: read run-arm.sh's summary when present.
+        summary = path[:-5] + ".runs.jsonl" if path.endswith(".json") else ""
+        denied = "n/a"
+        if os.path.exists(summary):
+            rows = [json.loads(line) for line in open(summary)]
+            denied = sum(1 for r in rows if r.get("denials") or r.get("ungranted"))
+        lines.append(f"| {l} | {len(runs)} | {errs} | {denied} | {mean:.2f} | {d['costUsd']:.2f} |")
 
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w") as f:

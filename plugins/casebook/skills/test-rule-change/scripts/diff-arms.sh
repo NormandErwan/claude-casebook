@@ -11,10 +11,12 @@ set -euo pipefail
 [ $# -ge 3 ] || { echo "usage: diff-arms.sh ARM_A ARM_B PATH..." >&2; exit 2; }
 A="$1" B="$2"; shift 2
 
+A="${A%/}" B="${B%/}"
+# "/" or ":" must follow the arm path: arms/old must not match arms/old-2.
 diffs=$(diff -rq "$A" "$B" 2>&1 | sed -E \
   -e "s#^Files $A/(.*) and $B/.* differ\$#\1#" \
-  -e "s#^Only in $A/?(.*): (.*)\$#\1/\2#" \
-  -e "s#^Only in $B/?(.*): (.*)\$#\1/\2#" \
+  -e "s#^Only in $A(/(.*))?: (.*)\$#\2/\3#" \
+  -e "s#^Only in $B(/(.*))?: (.*)\$#\2/\3#" \
   -e 's#^/##' |
   grep -v -E '^(\.claude-plugin/plugin\.json|evals/results(/.*)?)$' || true)
 
