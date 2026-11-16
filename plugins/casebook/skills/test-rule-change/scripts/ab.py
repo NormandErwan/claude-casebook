@@ -53,6 +53,11 @@ def usage():
     sys.exit(2)
 
 
+def has_flag(flags, name):
+    """True for `--x val` and `--x=val`."""
+    return any(f.split("=")[0] == name for f in flags)
+
+
 # edit: arm text derived by one checked edit, never by regex.
 
 def edit(args):
@@ -209,13 +214,23 @@ def summarize(trace):
 
 
 def remove_kept(d):
+    """Delete a kept eval dir: only <tempdir>/claude-eval-*, never elsewhere."""
+    d = os.path.realpath(d)
+    if (os.path.dirname(d) != os.path.realpath(tempfile.gettempdir())
+            or not os.path.basename(d).startswith("claude-eval-")):
+        return False
     subprocess.run(["chmod", "-R", "u+rwX", d])
     shutil.rmtree(d, ignore_errors=True)
+    return True
+
+
+def summary_path(src):
+    return re.sub(r"\.json$", "", src) + ".runs.jsonl"
 
 
 def write_summaries(src):
     """OUT.json -> OUT.runs.jsonl, then delete the kept eval temp dirs."""
-    out = re.sub(r"\.json$", "", src) + ".runs.jsonl"
+    out = summary_path(src)
     if os.path.exists(out):
         die("run", f"{out} exists")
     with open(src) as f:
@@ -233,10 +248,8 @@ def write_summaries(src):
                         kept.add(os.path.dirname(os.path.dirname(t)))
                     f.write(json.dumps(row, ensure_ascii=False) + "\n")
                     n += 1
-    for d in kept:
-        if "claude-eval-" in os.path.basename(d):
-            remove_kept(d)
-    print(f"ab run: {n} runs -> {out}; {len(kept)} temp dirs removed")
+    removed = sum(remove_kept(d) for d in kept)
+    print(f"ab run: {n} runs -> {out}; {removed} temp dirs removed")
 
 
 # preflight
@@ -259,7 +272,8 @@ def check_sandbox(flags):
         return ok("no Bash grant: sandbox not needed")
     missing = [b for b in ("bwrap", "socat") if not shutil.which(b)]
     if missing:
-        fail(f"Bash granted but {', '.join(missing)} missing: plugin eval refuses Bash")
+        fail(f"Bash granted but {', '.join(missing)} missing: plugin eval refuses Bash; "
+             "install (Debian/Ubuntu): apt-get update && apt-get install -y bubblewrap socat")
     ok("Bash sandbox backends present")
 
 
@@ -320,8 +334,7 @@ def check_pilot(arm, case, flags):
             events = [json.loads(l) for l in f if l.strip()]
         use = summarize(trace)
     finally:
-        if run_root.startswith(tempfile.gettempdir()) and "claude-eval-" in run_root:
-            remove_kept(run_root)
+        remove_kept(run_root)
 
     hook_out = "".join(e.get("output", "") for e in events if e.get("subtype") == "hook_response")
     rules = os.path.join(arm, "hooks", "claude-md.txt")
@@ -364,7 +377,7 @@ def preflight(args):
         usage()
     arm, case, flags = args[0], args[1], args[2:]
     for bad in ("--runs", "--case", "--max-cost-usd"):
-        if bad in flags:
+        if has_flag(flags, bad):
             fail(f"{bad} is set by preflight; pass case flags only")
     check_sandbox(flags)
     check_scaffolds(arm)
@@ -381,11 +394,12 @@ def run(args):
     arm, out, flags = args[0], args[1], args[2:]
     if not os.path.isdir(os.path.join(arm, ".claude-plugin")):
         die("run", f"{arm} is not a plugin dir")
-    if os.path.lexists(out):
-        die("run", f"{out} exists: use a new batch dir")
-    if "--max-cost-usd" not in flags:
+    for taken in (out, summary_path(out)):
+        if os.path.lexists(taken):
+            die("run", f"{taken} exists: use a new batch dir")
+    if not has_flag(flags, "--max-cost-usd"):
         die("run", "set --max-cost-usd for a paid run")
-    if "--ablation" not in flags:
+    if not has_flag(flags, "--ablation"):
         flags += ["--ablation", "none"]  # arm vs arm, compared by `compare`
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     rc = subprocess.run(["claude", "plugin", "eval", arm, *flags, "--keep-temp", "--trust-plugin",
@@ -432,7 +446,7 @@ def compare(args):
              "|---|---|" + "---|" * len(labels)]
     totals = {l: [0, 0] for l in labels}
     for n in names:
-        for g in sorted(arms[0][2][n]["graders"]):
+        for g in sorted(set().union(*(c[n]["graders"] for _, _, c in arms))):
             cells = []
             for l, _, c in arms:
                 p, k = c[n]["graders"].get(g, (0, 0))
@@ -447,7 +461,8 @@ def compare(args):
     for (l, d, c), path in zip(arms, paths):
         runs = [r for v in c.values() for r in v["runs"]]
         errs = sum(1 for r in runs if r.get("error"))
-        mean = sum(r["score"] for r in runs) / len(runs) if runs else 0
+        scores = [r["score"] for r in runs if r.get("score") is not None]
+        mean = sum(scores) / len(scores) if scores else 0
         # Denials live in the traces: read `run`'s summary when present.
         summary = path[:-5] + ".runs.jsonl" if path.endswith(".json") else ""
         denied = "n/a"
@@ -468,6 +483,9 @@ COMMANDS = {"edit": edit, "build": build, "diff": diff, "preflight": preflight,
 
 
 def main(argv):
+    if "-h" in argv or "--help" in argv:
+        print(__doc__.strip())
+        sys.exit(0)
     if not argv or argv[0] not in COMMANDS:
         usage()
     COMMANDS[argv[0]](argv[1:])

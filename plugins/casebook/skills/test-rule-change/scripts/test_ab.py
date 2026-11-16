@@ -15,26 +15,34 @@ AB = os.path.join(HERE, "ab.py")
 sys.path.insert(0, HERE)
 import ab  # noqa: E402
 
-# Stub `claude`: logs its args; for `--json OUT` writes a result whose one run
-# points at a trace kept in a fake claude-eval-* temp dir. Exit code 3.
-STUB = r'''#!/usr/bin/env python3
+# Stub `claude`: logs its args. With `--json OUT` it writes a result whose one
+# run points at a trace in a new $TMPDIR/<STUB_PREFIX>* dir; the trace is
+# STUB_EVENTS (a file, "@ROOT@" -> that dir) or one Skill call. Otherwise it
+# prints STUB_LOAD (the load check). Exits STUB_RC.
+STUB = r'''#!PYTHON
 import json, os, sys, tempfile
-log = os.environ["STUB_LOG"]
-with open(log, "a") as f:
+e = os.environ
+with open(e["STUB_LOG"], "a") as f:
     f.write(json.dumps(sys.argv[1:]) + "\n")
 a = sys.argv[1:]
 if "--json" in a:
-    root = tempfile.mkdtemp(prefix="claude-eval-", dir=os.environ["STUB_TMP"])
+    root = tempfile.mkdtemp(prefix=e.get("STUB_PREFIX", "claude-eval-"))
     os.makedirs(os.path.join(root, "t"))
     trace = os.path.join(root, "t", "trace.jsonl")
+    if e.get("STUB_EVENTS"):
+        events = open(e["STUB_EVENTS"]).read().replace("@ROOT@", root)
+    else:
+        events = json.dumps({"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "id": "1", "name": "Skill", "input": {"skill": "a:alpha"}}]}}) + "\n"
     with open(trace, "w") as f:
-        f.write(json.dumps({"type": "assistant", "message": {"content": [
-            {"type": "tool_use", "id": "1", "name": "Skill", "input": {"skill": "a:alpha"}}]}}) + "\n")
+        f.write(events)
     with open(a[a.index("--json") + 1], "w") as f:
         json.dump({"claudeVersion": "x", "costUsd": 0.01, "cases": [{"name": "c1", "arms": {
             "with": [{"score": 1.0, "costUsd": 0.01, "error": None, "tracePath": trace}]}}]}, f)
-sys.exit(3)
-'''
+else:
+    print(e.get("STUB_LOAD", "1 case loaded"))
+sys.exit(int(e.get("STUB_RC", "0")))
+'''.replace("PYTHON", sys.executable)
 
 
 def write(path, text):
@@ -48,26 +56,28 @@ def read(path):
         return f.read()
 
 
-def result(path, fired):
-    """Result JSON: case c<j> has 3 runs, the first fired[j] pass `fired`."""
-    runs = lambda k: [{"score": float(i < k), "costUsd": .01, "error": None,
-                       "graders": [{"name": "fired", "passed": i < k}]} for i in range(3)]
+def result(path, fired, graders=("fired",), score=True):
+    """Result JSON: case c<j> has 3 runs, the first fired[j] pass each grader."""
+    runs = lambda k: [{"score": float(i < k) if score else None, "costUsd": .01, "error": None,
+                       "graders": [{"name": g, "passed": i < k} for g in graders]}
+                      for i in range(3)]
     with open(path, "w") as f:
         json.dump({"claudeVersion": "x", "costUsd": .06, "cases": [
             {"name": f"c{j}", "arms": {"with": runs(k)}} for j, k in enumerate(fired)]}, f)
 
 
-class AbTest(unittest.TestCase):
+class Base(unittest.TestCase):
     def setUp(self):
         self.t = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.t, True)
-        bin_dir = os.path.join(self.t, "bin")
-        write(os.path.join(bin_dir, "claude"), STUB)
-        os.chmod(os.path.join(bin_dir, "claude"), 0o755)
-        self.log = os.path.join(self.t, "claude.log")
-        os.makedirs(os.path.join(self.t, "tmp"))
-        self.env = dict(os.environ, PATH=bin_dir + os.pathsep + os.environ.get("PATH", ""),
-                        STUB_LOG=self.log, STUB_TMP=os.path.join(self.t, "tmp"))
+        self.bin = os.path.join(self.t, "bin")
+        write(os.path.join(self.bin, "claude"), STUB)
+        os.chmod(os.path.join(self.bin, "claude"), 0o755)
+        self.log = self.p("claude.log")
+        self.tmp = self.p("tmp")  # TMPDIR of ab.py and the stub
+        os.makedirs(self.tmp)
+        self.env = dict(os.environ, PATH=self.bin + os.pathsep + os.environ.get("PATH", ""),
+                        STUB_LOG=self.log, TMPDIR=self.tmp)
         write(self.p("skills/alpha/SKILL.md"), "---\nname: alpha\n---\nA\n")
         write(self.p("skills/beta/SKILL.md"), "---\nname: beta\n---\nB\n")
         write(self.p("base.md"), "# Rules\n\n- Reply in French.\n- Reply in French.\n- Be brief.\n")
@@ -76,18 +86,18 @@ class AbTest(unittest.TestCase):
     def p(self, rel):
         return os.path.join(self.t, rel)
 
-    def ab(self, *args):
-        return subprocess.run([sys.executable, AB, *args], env=self.env,
+    def ab(self, *args, **env):
+        return subprocess.run([sys.executable, AB, *args], env=dict(self.env, **env),
                               capture_output=True, text=True, stdin=subprocess.DEVNULL)
 
-    def ok(self, *args):
-        r = self.ab(*args)
-        self.assertEqual(r.returncode, 0, f"{args}: {r.stderr}")
+    def ok(self, *args, **env):
+        r = self.ab(*args, **env)
+        self.assertEqual(r.returncode, 0, f"{args}: {r.stdout}{r.stderr}")
         return r
 
-    def refused(self, *args):
-        r = self.ab(*args)
-        self.assertNotEqual(r.returncode, 0, f"should fail: {args}")
+    def refused(self, *args, **env):
+        r = self.ab(*args, **env)
+        self.assertNotEqual(r.returncode, 0, f"should fail: {args}: {r.stdout}")
         return r
 
     def build(self, name, md="base.md"):
@@ -98,6 +108,15 @@ class AbTest(unittest.TestCase):
         if not os.path.exists(self.log):
             return []
         return [json.loads(l) for l in read(self.log).splitlines()]
+
+
+class AbTest(Base):
+    def test_help(self):
+        for args in (["-h"], ["build", "--help"], ["run", "x", "y", "-h"]):
+            r = self.ab(*args)
+            self.assertEqual(r.returncode, 0, args)
+            self.assertIn("usage:", r.stdout)
+        self.assertEqual(self.claude_calls(), [])
 
     # build
 
@@ -178,12 +197,14 @@ class AbTest(unittest.TestCase):
         r = self.refused("diff", self.p("a-base"), self.p("a-other"), "hooks")
         self.assertIn("identical", r.stderr)
 
-    # run guards (fail before calling claude)
+    # run
 
     def test_run_guards(self):
         self.build("a-base")
         write(self.p("taken.json"), "")
+        write(self.p("summed.runs.jsonl"), "")
         self.refused("run", self.p("a-base"), self.p("taken.json"), "--max-cost-usd", "1")
+        self.refused("run", self.p("a-base"), self.p("summed.json"), "--max-cost-usd", "1")
         self.refused("run", self.p("a-base"), self.p("free.json"))
         self.refused("run", self.p("skills"), self.p("free.json"), "--max-cost-usd", "1")
         self.assertEqual(self.claude_calls(), [])
@@ -192,7 +213,7 @@ class AbTest(unittest.TestCase):
         self.build("a-base")
         out = self.p("batch/a-base.json")
         r = self.ab("run", self.p("a-base"), out, "--allow-tools", "Write", "Edit",
-                    "--max-cost-usd", "2")
+                    "--max-cost-usd", "2", STUB_RC="3")
         self.assertEqual(r.returncode, 3, r.stderr)  # plugin eval's code
         (args,) = self.claude_calls()
         self.assertEqual(args[:3], ["plugin", "eval", self.p("a-base")])
@@ -202,21 +223,21 @@ class AbTest(unittest.TestCase):
         (row,) = [json.loads(l) for l in read(self.p("batch/a-base.runs.jsonl")).splitlines()]
         self.assertEqual((row["case"], row["arm"], row["run"], row["skills"]),
                          ("c1", "with", 0, ["a:alpha"]))
-        self.assertEqual(os.listdir(self.p("tmp")), [], "kept temp dir not removed")
+        self.assertEqual(os.listdir(self.tmp), [], "kept temp dir not removed")
 
-    def test_run_keeps_given_ablation(self):
+    def test_run_equals_flags(self):
         self.build("a-base")
-        self.ab("run", self.p("a-base"), self.p("o.json"), "--ablation", "all", "--max-cost-usd", "1")
+        self.ok("run", self.p("a-base"), self.p("o.json"), "--ablation=all", "--max-cost-usd=1")
         (args,) = self.claude_calls()
-        self.assertEqual(args.count("--ablation"), 1)
+        self.assertNotIn("--ablation", args)
+        self.assertIn("--ablation=all", args)
 
-    # preflight guard
-
-    def test_preflight_refuses_set_flags(self):
+    def test_run_keeps_non_eval_dir(self):
         self.build("a-base")
-        for bad in ("--runs", "--case", "--max-cost-usd"):
-            self.refused("preflight", self.p("a-base"), "c1", bad, "1")
-        self.assertEqual(self.claude_calls(), [])
+        self.ok("run", self.p("a-base"), self.p("o.json"), "--max-cost-usd", "1",
+                STUB_PREFIX="keep-")
+        (kept,) = os.listdir(self.tmp)
+        self.assertTrue(kept.startswith("keep-"))
 
     # compare
 
@@ -240,6 +261,100 @@ class AbTest(unittest.TestCase):
             {"denials": [], "ungranted": []})) + "\n")
         self.ok("compare", self.p("cmp.md"), self.p("old.json"), self.p("new.json"))
         self.assertIn("| new | 3 | 0 | 2 |", read(self.p("cmp.md")))
+
+    def test_compare_grader_union_and_none_score(self):
+        result(self.p("old.json"), [1])
+        result(self.p("new.json"), [2], graders=("fired", "extra"), score=False)
+        self.ok("compare", self.p("cmp.md"), self.p("old.json"), self.p("new.json"))
+        table = read(self.p("cmp.md"))
+        self.assertIn("| c0 | extra | 0/0 | 2/3 |", table)
+        self.assertIn("| new | 3 | 0 | n/a | 0.00 |", table)
+
+
+class PreflightTest(Base):
+    def setUp(self):
+        super().setUp()
+        self.build("a-base")
+        self.arm = self.p("a-base")
+        self.rules = read(self.p("a-base/hooks/claude-md.txt"))
+
+    def events(self, hook=None, skills=("alpha", "beta"), memory="@ROOT@/memory",
+               denials=(), ungranted=False):
+        ev = [{"type": "system", "subtype": "hook_response",
+               "output": self.rules if hook is None else hook},
+              {"type": "system", "subtype": "init",
+               "skills": [f"a-base:{s}" for s in skills] + ["other:x"],
+               "memory_paths": {"auto": memory}}]
+        if ungranted:
+            ev += [{"type": "assistant", "message": {"content": [
+                       {"type": "tool_use", "id": "w", "name": "WebFetch", "input": {}}]}},
+                   {"type": "user", "message": {"content": [
+                       {"type": "tool_result", "tool_use_id": "w",
+                        "content": "No such tool available: WebFetch"}]}}]
+        ev.append({"type": "result", "permission_denials": [{"tool_name": d} for d in denials]})
+        path = self.p("events.jsonl")
+        write(path, "".join(json.dumps(e) + "\n" for e in ev))
+        return path
+
+    def preflight(self, *flags, events=None, **env):
+        return self.ab("preflight", self.arm, "c1", *flags,
+                       STUB_EVENTS=events or self.events(), **env)
+
+    def assert_fails(self, r, text):
+        self.assertNotEqual(r.returncode, 0, r.stdout)
+        self.assertIn(text, r.stderr)
+
+    def test_happy_path(self):
+        write(self.p("a-base/evals/c1/case.yaml"), 'name: "c1"\nscaffold_script: "setup.sh"\n')
+        write(self.p("a-base/evals/c1/setup.sh"), "touch ready\n")
+        write(self.p("a-base/evals/c1/check.sh"), "test -f ready\n")
+        r = self.preflight("--model", "m", STUB_LOAD="⚠ cost ceiling $0: no run")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("1 scaffolds green", r.stdout)
+        self.assertIn("all checks passed", r.stdout)
+        load, pilot = self.claude_calls()
+        self.assertIn("--max-cost-usd", load)
+        self.assertEqual(pilot[pilot.index("--case") + 1], "c1")
+        self.assertIn("--keep-temp", pilot)
+        self.assertEqual(os.listdir(self.tmp), [], "kept temp dir not removed")
+
+    def test_refuses_set_flags(self):
+        for bad in ("--runs", "--case", "--max-cost-usd", "--runs=3"):
+            self.refused("preflight", self.arm, "c1", bad, "1")
+        self.assertEqual(self.claude_calls(), [])
+
+    def test_bash_without_sandbox(self):
+        r = self.preflight("--allow-tools", "Bash", PATH=self.bin)
+        self.assert_fails(r, "apt-get install -y bubblewrap socat")
+        self.assertEqual(self.claude_calls(), [])
+
+    def test_red_scaffold(self):
+        write(self.p("a-base/evals/c1/case.yaml"), 'name: "c1"\nscaffold_script: "setup.sh"\n')
+        write(self.p("a-base/evals/c1/setup.sh"), "echo broken >&2; exit 4\n")
+        self.assert_fails(self.preflight(), "setup.sh exit 4: broken")
+
+    def test_load_warning(self):
+        self.assert_fails(self.preflight(STUB_LOAD="⚠ c1: tool Bash not granted"), "load check")
+
+    def test_claude_md_not_whole(self):
+        r = self.preflight(events=self.events(hook=self.rules.splitlines()[0]))
+        self.assert_fails(r, "not in SessionStart hook output")
+
+    def test_skill_missing(self):
+        self.assert_fails(self.preflight(events=self.events(skills=["alpha"])), "['beta']")
+
+    def test_foreign_memory(self):
+        r = self.preflight(events=self.events(memory="/home/someone/.claude/memory"))
+        self.assert_fails(r, "foreign context loaded (memory_paths)")
+
+    def test_permission_denial(self):
+        self.assert_fails(self.preflight(events=self.events(denials=["Edit"])),
+                          "permission denials: ['Edit']")
+
+    def test_ungranted_warns(self):
+        r = self.preflight(events=self.events(ungranted=True))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("WARN pilot called ungranted tools ['WebFetch']", r.stdout)
 
 
 class SummarizeTest(unittest.TestCase):
@@ -278,6 +393,21 @@ class SummarizeTest(unittest.TestCase):
             self.assertTrue(ab.BASH_WRITE.search(c), c)
         for c in reads:
             self.assertFalse(ab.BASH_WRITE.search(c), c)
+
+    def test_remove_kept_only_eval_dirs_in_tempdir(self):
+        tmp = tempfile.gettempdir()
+        eval_dir = tempfile.mkdtemp(prefix="claude-eval-")
+        nested = tempfile.mkdtemp()
+        inner = os.path.join(nested, "claude-eval-x")
+        other = tempfile.mkdtemp(prefix="keep-")
+        os.makedirs(inner)
+        self.addCleanup(shutil.rmtree, nested, True)
+        self.addCleanup(shutil.rmtree, other, True)
+        self.assertTrue(ab.remove_kept(os.path.join(tmp, os.path.basename(eval_dir))))
+        self.assertFalse(os.path.exists(eval_dir))
+        self.assertFalse(ab.remove_kept(inner))
+        self.assertFalse(ab.remove_kept(other))
+        self.assertTrue(os.path.isdir(inner) and os.path.isdir(other))
 
 
 if __name__ == "__main__":
