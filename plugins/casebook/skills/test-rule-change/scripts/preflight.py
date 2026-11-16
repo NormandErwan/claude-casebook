@@ -62,7 +62,10 @@ def check_scaffolds(arm):
             for step in (os.path.join(case_dir, m.group(1)), os.path.join(case_dir, "check.sh")):
                 if not os.path.exists(step):
                     continue
+                # plugin eval gives a scaffold PATH only: a tool found through
+                # another inherited var here would be missing in the run.
                 r = subprocess.run(["bash", os.path.abspath(step)], cwd=ws,
+                                   env={"PATH": os.environ.get("PATH", "")},
                                    capture_output=True, text=True, stdin=subprocess.DEVNULL)
                 if r.returncode:
                     fail(f"{os.path.relpath(step, arm)} exit {r.returncode}: {r.stderr.strip()[-300:]}")
@@ -110,10 +113,10 @@ def check_pilot(arm, case, flags):
     hook_out = "".join(e.get("output", "") for e in events if e.get("subtype") == "hook_response")
     rules = os.path.join(arm, "hooks", "claude-md.txt")
     if os.path.exists(rules):
-        head = open(rules).read()[:300]
-        if head not in hook_out:
-            fail("arm CLAUDE.md text not in SessionStart hook output")
-        ok("arm CLAUDE.md reached the session")
+        # Whole text: two arms often differ only after the opening lines.
+        if open(rules).read().strip() not in hook_out:
+            fail("arm CLAUDE.md text not in SessionStart hook output, or not whole")
+        ok("arm CLAUDE.md reached the session, whole")
 
     init = next((e for e in events if e.get("subtype") == "init"), None)
     if not init:
