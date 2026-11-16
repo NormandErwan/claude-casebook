@@ -89,3 +89,32 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - [ ] New cases under `plugins/backlog/evals/`, listed in `EVALS.md`
   - [ ] Pilot, then every case at 5 runs per arm with-without on `claude-sonnet-5-5`, results and cost in the `backlog` provenance row
   - [ ] Any failure filed in `casebook/retrospective.md` or fixed with a version bump
+
+### Move write-skill's eval procedure to claude plugin eval
+- **Status:** ready
+- **Context:** `plugins/write-skill/skills/write-skill/evaluating-skills-with-subagents.md` ("Isolate the arms") still runs each arm with headless `claude -p`, while `test-rule-change` and the write-prompt rebuild already use `claude plugin eval` (no-plugin arm, `--runs`, `--judge-model`, `--max-cost-usd`). Retrospective row 2026-11-01 "An eval procedure prescribes a hand-built harness". Untested: whether `claude plugin eval` keeps the isolation the file requires (no ancestor `CLAUDE.md`, no synced same-named skill) and covers the subagent-pressure scenarios.
+- **Next:** pilot one pressure case under `claude plugin eval` with a probe that quotes an arm-specific passage; check no ancestor `CLAUDE.md` loads.
+- **Done when:**
+  - [ ] the file runs arms with `claude plugin eval`, `claude -p` kept as the fallback for what it cannot cover, plugin version bumped
+  - [ ] NormandErwan/Claude `CONTRIBUTING.md` Testing step 2 points to the same runner
+  - [ ] the retrospective row reads `applied` with this PR
+
+### Reword write-skill's emphatic lines and its no-exception test rule
+- **Status:** ready
+- **Context:** two retrospective rows of 2026-11-03. `write-skill` keeps inherited `REQUIRED BACKGROUND: You MUST` lines, and `cso-guide.md` shows `You MUST` as the good form; current models over-apply that register (hypothesis, `code.claude.com/docs/en/best-practices`). Its "no skill without a failing test first, no exceptions" contradicts `test-rule-change`'s table (observe a narrow rule, waive with a reason); its evidence dates from Sonnet 4.6.
+- **Next:** take the "Run the write-skill evals" baseline, then rewrite the lines in plain case with their reason and align the test rule with `test-rule-change`.
+- **Done when:**
+  - [ ] no unexplained MUST/REQUIRED left in `plugins/write-skill`, `cso-guide.md` examples included
+  - [ ] the test rule matches `test-rule-change`, re-tested on Opus 5.5
+  - [ ] `pressure-a1`..`a3` re-run against the baseline, results in the `write-skill` provenance row
+  - [ ] both retrospective rows read `applied` with this PR
+- **Blocked by:** Run the write-skill evals
+
+### Re-check write-hook's observed hook behaviours on current Claude Code
+- **Status:** ready
+- **Context:** `plugins/write-hook/skills/write-hook/SKILL.md` states hook behaviours "observed in Claude Code web sessions, 2026-08-22 and 2026-08-23" with no Claude Code version; `transcripts/red-s2.md` disagrees on `additionalContext` for `Stop`. Retrospective row 2026-11-03 "A skill's central claim about harness behaviour carries an observation date but no harness version".
+- **Next:** in a web session, run one minimal hook per event in the skill's table and record what reaches the model.
+- **Done when:**
+  - [ ] each table row confirmed or corrected, with the Claude Code version next to the date
+  - [ ] `red-s2.md` disagreement resolved, plugin version bumped
+  - [ ] the retrospective row reads `applied` with this PR
