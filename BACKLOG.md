@@ -145,3 +145,14 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 - **Done when:**
   - [ ] the rule written in `CLAUDE.md` "Layout"
   - [ ] existing research and result files moved to match it, and links updated
+
+### Check backlog 0.2.0 on the next three unfinished tasks
+- **Status:** blocked: waits until three sessions, in any repository using `backlog` 0.2.0, leave a task unfinished after a failed approach or an owner decision
+- **Context:** `backlog` 0.2.0 adds `Ruled out:` and asks a session ending unfinished to record failed
+  approaches there and owner decisions in `Context`. Owner, 2026-11-24: observe it instead of an A/B
+  (`casebook/provenance.md`, row `backlog` 0.2.0). Origin: `session_01RGXu8XnXTwy41PoZB1yopT`.
+- **Next:** on each session that leaves a task unfinished, check its `BACKLOG.md` diff for the failed
+  approach and the owner's decisions; list the repository, session id and result here.
+- **Done when:**
+  - [ ] three sessions checked, each listed here with its id and whether the task carried both
+  - [ ] a miss reported to the owner, or the provenance row noted "observed 3/3"
