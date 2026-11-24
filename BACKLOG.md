@@ -127,6 +127,15 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - [ ] every kept finding filed as a row in `casebook/retrospective.md`
   - [ ] this task's due date moved three months on, rather than the task deleted
 
+### Express A/B test cost estimates as a share of the subscription limit
+- **Status:** needs owner: whether any conversion is reliable enough to report (owner parked it 2026-11-24)
+- **Context:** `test-rule-change` step 5 and `test-rule-change.py` report cost in USD (`--max-cost-usd`, compare table), which says little to a Pro subscriber whose limit is a 5-hour window. Owner measurement: resuming a 300k-token session on Opus moved the 5-hour gauge from 0 to 5%, about 6M tokens per window. Three reasons it does not convert as is: the gauge rounds (4.5-5.5% gives 5.5-6.7M); usage depends on model, message length and effort ([support article](https://support.claude.com/en/articles/11647753-how-do-usage-and-length-limits-work)), and evals often run Haiku; a resume is uncached input, while an eval run is mostly cache reads, whose weight is unknown.
+- **Next:** option kept on 2026-11-24 if resumed: sum tokens per run from the eval's `trace.jsonl`, divide by an owner-calibrated tokens-per-window rate per model, print "about X% of the 5-hour window" next to the USD figure. Ask the owner for a Haiku rate first.
+- **Done when:**
+  - [ ] the owner decides to build it or drops the task
+  - [ ] if built: `test-rule-change.py` prints the estimate after the pilot, step 5 of `SKILL.md` asks to state it, plugin version bumped
+- **Out of scope:** removing `--max-cost-usd`: it stays the only hard cap `plugin eval` offers.
+
 ### Decide where research and eval results live
 - **Status:** needs owner: inside the skill dir, at the repository root, or in a plugin-level folder
 - **Context:** interim: `test-rule-change`'s research and results sit in its skill dir,
