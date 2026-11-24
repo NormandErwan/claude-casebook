@@ -1,6 +1,6 @@
 ---
 name: log-rule-incident
-version: 0.6.0
+version: 0.7.0
 description: Use when the user corrects you, when a rule or skill failed to fire or did not cover
   the case, when a tool block forced another approach, or when the user states a new preference.
   Also when adding, rewording or retiring a rule in a CLAUDE.md or a skill, or when asked to

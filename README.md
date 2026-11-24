@@ -45,6 +45,10 @@ $T run arms/new out/new.json --model claude-haiku-5-5 --scaffold --runs 3 --max-
 $T compare out/compare.md out/old.json out/new.json   # passes/runs per case and arm
 ```
 
+A case that grants Bash runs it under the OS sandbox, which needs `bubblewrap` and `socat`;
+`preflight` refuses the case without them. In a cloud environment, put
+`apt-get update && apt-get install -y bubblewrap socat` in its setup script.
+
 Each subcommand refuses a known way to waste a run: an edit that matches twice, arms that differ
 elsewhere, a tool not granted, a red fixture, a rule that never reached the session, a result
 overwritten. First use: two `backlog` versions on 15 trigger cases, 90 Haiku runs in about five

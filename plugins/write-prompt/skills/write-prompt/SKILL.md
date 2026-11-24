@@ -1,5 +1,5 @@
 ---
-version: 2.1.1
+version: 2.2.0
 name: write-prompt
 description: "Use when writing or editing text an AI model will follow as instructions: a CLAUDE.md or AGENTS.md rule, a SKILL.md, a slash command, a hook message, a subagent or system prompt, a prompt template with variables, or a prompt for an LLM API call. Also when such a prompt gives inconsistent or wrong results. Load it before drafting, even for a one-line rule."
 ---
@@ -30,6 +30,8 @@ lists over prose for rules, steps, or conditions.
 
 - **One item per condition**, each stating the trigger and the action, or what is blocked
   and what to do instead.
+- **A scope or exception names the class it covers.** A named case (one file, one skill) goes
+  in only as an example of that class; a list of named cases leaves out the next one.
 - **Don't restate what Claude already knows.** No explanation of what git, a branch, JSON or
   a tool Claude already understands is (e.g. what `AskUserQuestion` does): the reader is a
   model that knows them.
