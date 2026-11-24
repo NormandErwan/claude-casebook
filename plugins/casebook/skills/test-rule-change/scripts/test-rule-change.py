@@ -231,6 +231,31 @@ def remove_kept(d):
     return True
 
 
+# macOS: /tmp and /var/tmp resolve under /private.
+SANDBOX_DENIED_TMP = ("/tmp", "/var/tmp", "/dev/shm", "/private/tmp", "/private/var/tmp")
+
+
+def move_tmpdir():
+    """plugin eval roots each run in $TMPDIR/claude-eval-*, and its sandbox
+    denies writes to /tmp, /var/tmp and /dev/shm. Under them the deny wins over
+    the run's own allowWrite: every Bash write fails "Read-only file system",
+    the cwd-tracking file included, so each Bash call exits 1
+    (anthropics/claude-code#104631). Root runs outside them instead:
+    $CASEBOOK_EVAL_TMPDIR (taken as given), else ~/.cache/claude-eval-tmp.
+    Read-denied $HOME is fine: the run's allowRead re-opens its own root."""
+    cur = os.path.realpath(tempfile.gettempdir())
+    if not any(under(cur, d) for d in SANDBOX_DENIED_TMP):
+        return
+    cache = os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+    new = os.path.realpath(os.environ.get("CASEBOOK_EVAL_TMPDIR")
+                           or os.path.join(cache, "claude-eval-tmp"))
+    os.makedirs(new, mode=0o700, exist_ok=True)
+    os.environ["TMPDIR"] = new  # inherited by `claude plugin eval`
+    tempfile.tempdir = None  # gettempdir() re-reads TMPDIR; remove_kept follows
+    print(f"test-rule-change: TMPDIR {cur} -> {new} (plugin eval sandbox denies writes under /tmp)",
+          file=sys.stderr)
+
+
 def summary_path(src):
     return re.sub(r"\.json$", "", src) + ".runs.jsonl"
 
@@ -396,6 +421,13 @@ def check_pilot(arm, case, flags):
             fail(f"foreign context loaded ({key}): {foreign}")
     ok("no foreign memory or extra dir")
 
+    # plugin eval scores an unwritable workspace as low scores, not as an error.
+    if any(c.get("type") == "tool_result" and "Read-only file system" in str(c.get("content"))
+           for e in events if e.get("type") == "user"
+           for c in (e.get("message", {}).get("content") or []) if isinstance(c, dict)):
+        fail("pilot hit 'Read-only file system': the run's workspace is not writable "
+             f"(eval root {run_root}; see move_tmpdir)")
+    ok("workspace writable")
     if use["denials"]:
         fail(f"permission denials: {use['denials']}")
     ok("no permission denial")
@@ -412,6 +444,7 @@ def preflight(args):
     for bad in ("--runs", "--case", "--max-cost-usd"):
         if has_flag(flags, bad):
             fail(f"{bad} is set by preflight; pass case flags only")
+    move_tmpdir()
     check_sandbox(flags)
     check_scaffolds(arm)
     check_load(arm, flags)
@@ -435,6 +468,7 @@ def run(args):
     if not has_flag(flags, "--ablation"):
         flags += ["--ablation", "none"]  # arm vs arm, compared by `compare`
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    move_tmpdir()
     rc = subprocess.run(["claude", "plugin", "eval", arm, *flags, "--keep-temp", "--trust-plugin",
                          "--no-publish", "--json", out], stdin=subprocess.DEVNULL).returncode
     if os.path.exists(out):

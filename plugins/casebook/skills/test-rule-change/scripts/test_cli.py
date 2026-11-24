@@ -79,8 +79,9 @@ class Base(unittest.TestCase):
         self.log = self.p("claude.log")
         self.tmp = self.p("tmp")  # TMPDIR of the CLI and the stub
         os.makedirs(self.tmp)
+        # self.tmp may sit under /tmp: CASEBOOK_EVAL_TMPDIR keeps move_tmpdir on it.
         self.env = dict(os.environ, PATH=self.bin + os.pathsep + os.environ.get("PATH", ""),
-                        STUB_LOG=self.log, TMPDIR=self.tmp)
+                        STUB_LOG=self.log, TMPDIR=self.tmp, CASEBOOK_EVAL_TMPDIR=self.tmp)
         write(self.p("skills/alpha/SKILL.md"), "---\nname: alpha\n---\nA\n")
         write(self.p("skills/beta/SKILL.md"), "---\nname: beta\n---\nB\n")
         write(self.p("base.md"), "# Rules\n\n- Reply in French.\n- Reply in French.\n- Be brief.\n")
@@ -318,7 +319,7 @@ class PreflightTest(Base):
         self.rules = read(self.p("a-base/hooks/claude-md.txt"))
 
     def events(self, hook=None, skills=("alpha", "beta"), memory="@ROOT@/memory",
-               denials=(), ungranted=False):
+               denials=(), ungranted=False, readonly=False):
         ev = [{"type": "system", "subtype": "hook_response",
                "output": self.rules if hook is None else hook},
               {"type": "system", "subtype": "init",
@@ -330,6 +331,10 @@ class PreflightTest(Base):
                    {"type": "user", "message": {"content": [
                        {"type": "tool_result", "tool_use_id": "w",
                         "content": "No such tool available: WebFetch"}]}}]
+        if readonly:
+            ev.append({"type": "user", "message": {"content": [
+                {"type": "tool_result", "tool_use_id": "b", "is_error": True,
+                 "content": "Exit code 1\n/bin/bash: @ROOT@/tmp/cwd-1: Read-only file system"}]}})
         ev.append({"type": "result", "permission_denials": [{"tool_name": d} for d in denials]})
         path = self.p("events.jsonl")
         write(path, "".join(json.dumps(e) + "\n" for e in ev))
@@ -389,6 +394,11 @@ class PreflightTest(Base):
     def test_permission_denial(self):
         self.assert_fails(self.preflight(events=self.events(denials=["Edit"])),
                           "permission denials: ['Edit']")
+
+    def test_readonly_workspace(self):
+        # anthropics/claude-code#104631: the run is scored, not errored.
+        self.assert_fails(self.preflight(events=self.events(readonly=True)),
+                          "pilot hit 'Read-only file system'")
 
     def test_ungranted_warns(self):
         r = self.preflight(events=self.events(ungranted=True))
@@ -462,6 +472,32 @@ class SummarizeTest(unittest.TestCase):
                          ["Write", "Bash"])
         self.assertEqual(cli.granted(["--allow-tools=Read,Bash(git:*)"]), ["Read", "Bash(git:*)"])
         self.assertEqual(cli.granted(["--model", "Bash"]), [])
+
+    def move_tmpdir(self, tmpdir, **env):
+        """move_tmpdir() in-process from TMPDIR=tmpdir; returns the TMPDIR it leaves."""
+        saved = dict(os.environ)
+        self.addCleanup(lambda: (os.environ.clear(), os.environ.update(saved),
+                                 setattr(tempfile, "tempdir", None)))
+        os.environ.pop("CASEBOOK_EVAL_TMPDIR", None)
+        os.environ.update(TMPDIR=tmpdir, **env)
+        tempfile.tempdir = None
+        cli.move_tmpdir()
+        self.assertEqual(tempfile.gettempdir(), os.environ["TMPDIR"])
+        return os.environ["TMPDIR"]
+
+    def test_move_tmpdir_leaves_tmp(self):
+        # Under /tmp: the sandbox's //tmp write deny would make the run read-only.
+        t = tempfile.mkdtemp(dir="/tmp")
+        self.addCleanup(shutil.rmtree, t, True)
+        moved = self.move_tmpdir(t, XDG_CACHE_HOME=os.path.join(t, "cache"))
+        self.assertEqual(moved, os.path.realpath(os.path.join(t, "cache", "claude-eval-tmp")))
+        self.assertTrue(os.path.isdir(moved))
+        self.assertEqual(self.move_tmpdir(t, CASEBOOK_EVAL_TMPDIR=os.path.join(t, "x")),
+                         os.path.realpath(os.path.join(t, "x")))
+
+    def test_move_tmpdir_keeps_tmpdir_outside_tmp(self):
+        here = os.path.realpath(HERE)
+        self.assertEqual(self.move_tmpdir(here), here)
 
     def test_remove_kept_only_eval_dirs_in_tempdir(self):
         tmp = tempfile.gettempdir()
