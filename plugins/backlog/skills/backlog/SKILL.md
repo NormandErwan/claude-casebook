@@ -1,6 +1,6 @@
 ---
 name: backlog
-version: 0.1.1
+version: 0.2.0
 description: Use when the user defers work or puts it out of scope ("later", "not now", "note it", "remind me", "out of scope"), when work is found mid-session but left undone, or when a plan has steps beyond this session; also when a task in the repo's backlog (BACKLOG.md, or the issue tracker it names) is named, started, finished or dropped.
 ---
 
@@ -55,8 +55,10 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 ### <Imperative title>
 - **Status:** ready | in progress (<branch>) | blocked: <reason> | needs owner: <decision> | owner steps pending
 - **Blocked by:** <task title>                 (omit when none)
-- **Context:** <why, what is settled, links: 2-4 lines>
+- **Context:** <why, what is settled, links: short>
 - **Next:** <first concrete step>
+- **Ruled out:**                               (omit when none)
+  - <approach tried> -> <result, link>
 - **Done when:**
   - [ ] <testable criterion>
 - **Owner steps:** <when: after merge, before merge...>   (omit when none)
@@ -76,10 +78,12 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - `owner steps pending`: the agent's part is done; waits on the owner running `Owner steps`.
 - `Blocked by`: titles of the tasks that must be done first. A title no longer in the file
   (or a closed issue) means that task is done or dropped.
-- `Context`: 2-4 lines. Why the task exists and what is already decided. Link artifacts (PR,
-  doc, ledger row) instead of copying them.
+- `Context`: short. Why the task exists and what is already decided. Link artifacts (PR, doc,
+  ledger row) instead of copying them; a session is linked by its id, a state by its commit.
 - `Next`: the agent's first concrete step. No implementation plan: the session doing the work
   writes it.
+- `Ruled out`: one item per approach tried that failed: what was tried, the result, the link to
+  the evidence. A later session does not retry it without a new fact.
 - `Done when`: testable criteria, each checkable on its own. "Works correctly" is not one.
 - `Owner steps`: actions only the owner can do (access the agent lacks: a server, a secret, an
   account, a device). Ordered; each one runs as written, with its exact command or click path,
@@ -107,8 +111,9 @@ in the reply, in the format above, for the user to file.
 - Task named with `Status: owner steps pending` -> give the owner its `Owner steps`, ask
   whether they worked.
 - Start -> set `Status: in progress (<branch>)`.
-- Session ends unfinished -> rewrite `Next` to where the work stopped. Stuck -> set `Status` to
-  `blocked` or `needs owner`.
+- Session ends unfinished -> rewrite `Next` to where the work stopped, add each approach that
+  failed to `Ruled out`, and each owner decision made this session to `Context`. Stuck -> set
+  `Status` to `blocked` or `needs owner`.
 - Agent's part done, `Owner steps` left -> in the PR that does the work, set
   `Status: owner steps pending` and tick the criteria the agent could check. End the reply with
   the `Owner steps`, numbered, as written in the task.
@@ -132,5 +137,6 @@ in the reply, in the format above, for the user to file.
 - An owner action written in `Next` or `Context`, or an `Owner steps` item without its exact
   command, `Check` or `Undo`.
 - A secret's value written in the backlog.
+- A session ends with an approach failed or an owner decision made, and the task does not carry it.
 - Deleting a task whose `Owner steps` the owner has not confirmed.
 - A task with `Owner steps` filed or handed over, and the reply does not list them.
