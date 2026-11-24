@@ -158,7 +158,7 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   a session linked by its id and a state by its commit; "Session ends unfinished" also fills
   `Ruled out` and adds the owner's decisions to `Context`.
 - **Done when:**
-  - [ ] a case where a session ends unfinished after a failed attempt and an owner decision: the
-    task written carries both, with and without the change, through `test-rule-change`
+  - [ ] `test-rule-change` A/B on a case where a session ends unfinished after a failed attempt and
+    an owner decision: the task written carries both with the change, compared with the current skill
   - [ ] `backlog` version bumped, `casebook/provenance.md` row added
 - **Out of scope:** splitting `BACKLOG.md` into per-task files; tracked handoffs.
