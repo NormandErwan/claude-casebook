@@ -145,3 +145,20 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 - **Done when:**
   - [ ] the rule written in `CLAUDE.md` "Layout"
   - [ ] existing research and result files moved to match it, and links updated
+
+### Carry ruled-out approaches, origins and owner decisions in backlog tasks
+- **Status:** ready
+- **Context:** NormandErwan/Claude compared four past handoffs with the tasks covering the same work
+  (`docs/research/2026-11-24-backlog-vs-handoff.md` there, PR NormandErwan/Claude#143). Handoffs
+  carried three things tasks lost: approaches tried and failed (G2), the session id and commit of the
+  work (G3), owner decisions made mid-session (G5). Owner, 2026-11-24: option A with the before/after
+  in that PR's thread; no per-task files, no committed handoffs, no open-PR check (G1).
+- **Next:** draft the three edits with `write-skill`: an optional `Ruled out:` field
+  (`<approach> -> <result, link>`, after `Next`); `Context` limit "2-4 lines" replaced by "short",
+  a session linked by its id and a state by its commit; "Session ends unfinished" also fills
+  `Ruled out` and adds the owner's decisions to `Context`.
+- **Done when:**
+  - [ ] a case where a session ends unfinished after a failed attempt and an owner decision: the
+    task written carries both, with and without the change, through `test-rule-change`
+  - [ ] `backlog` version bumped, `casebook/provenance.md` row added
+- **Out of scope:** splitting `BACKLOG.md` into per-task files; tracked handoffs.
