@@ -147,7 +147,7 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - [ ] existing research and result files moved to match it, and links updated
 
 ### Carry ruled-out approaches, origins and owner decisions in backlog tasks
-- **Status:** ready
+- **Status:** in progress (docs/backlog-handoff-gaps)
 - **Context:** NormandErwan/Claude compared four past handoffs with the tasks covering the same work
   (`docs/research/2026-11-24-backlog-vs-handoff.md`, from PR NormandErwan/Claude#143). Handoffs
   carried three things tasks lost: approaches tried and failed (G2), the session id and commit of the

@@ -1,6 +1,6 @@
 {
   "name": "backlog",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Keeps work not done yet as short handoffs a fresh session can start from: one section per task in the repo's BACKLOG.md, or issues in the tracker you name.",
   "author": { "name": "Erwan Normand" },
   "homepage": "https://github.com/NormandErwan/claude-casebook",
