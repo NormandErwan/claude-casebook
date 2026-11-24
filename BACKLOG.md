@@ -21,8 +21,8 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   - [ ] Every plugin the new rule covers has a `<name>--v<version>` tag on `origin`
 - **Owner steps:** after merge, from an up-to-date `main` checkout. Shown for the two listed plugins; add one step per other plugin the decision covers.
   1. Tag `write-prompt`: `claude plugin tag plugins/write-prompt --push`
-     - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.1.1`
-     - Undo: `git push origin :refs/tags/write-prompt--v2.1.1 && git tag -d write-prompt--v2.1.1`
+     - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.2.0`
+     - Undo: `git push origin :refs/tags/write-prompt--v2.2.0 && git tag -d write-prompt--v2.2.0`
   2. Tag `backlog`: `claude plugin tag plugins/backlog --push`
      - Check: `git ls-remote --tags origin` lists `refs/tags/backlog--v0.1.1`
      - Undo: `git push origin :refs/tags/backlog--v0.1.1 && git tag -d backlog--v0.1.1`
