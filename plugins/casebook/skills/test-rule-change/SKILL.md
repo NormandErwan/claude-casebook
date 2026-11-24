@@ -1,6 +1,6 @@
 ---
 name: test-rule-change
-version: 0.6.0
+version: 0.7.0
 description: Use before merging a change to a rule that applies in every session (a CLAUDE.md
   rule, a SessionStart hook's text, a skill description) or to a rule that gates a push, a pull
   request or a deletion; also when about to claim that a rule change works, or when a reviewer
@@ -38,7 +38,9 @@ Run the steps in this order:
 4. **Pilot before the full run.** One run per arm, including an arm built after the first pilot
    (a rebuilt treatment, a second model): it gets its own pilot before its full run. The baseline must show the failure the change
    targets at least once in two runs, or the eval cannot show a difference: fix the eval.
-   The treatment pilot must show the rule loaded.
+   The treatment pilot must show the rule loaded. Read each pilot reply in full: anything it
+   cites that the case did not give it (a budget, a path, a tool denial, a later result) is a
+   leak from the setup: fix the eval before the full run.
 5. **Run** with `claude plugin eval <plugin>` (cases in the plugin's `evals/`; see
    `claude plugin eval --help` for the case format). Set `--max-cost-usd` for a paid run.
    Before launching, state the number of agent runs and that they share the session's rate
