@@ -149,7 +149,7 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 ### Carry ruled-out approaches, origins and owner decisions in backlog tasks
 - **Status:** ready
 - **Context:** NormandErwan/Claude compared four past handoffs with the tasks covering the same work
-  (`docs/research/2026-11-24-backlog-vs-handoff.md` there, PR NormandErwan/Claude#143). Handoffs
+  (`docs/research/2026-11-24-backlog-vs-handoff.md`, from PR NormandErwan/Claude#143). Handoffs
   carried three things tasks lost: approaches tried and failed (G2), the session id and commit of the
   work (G3), owner decisions made mid-session (G5). Owner, 2026-11-24: option A, before/after in that
   note; no per-task files, no committed handoffs, no open-PR check (G1).
