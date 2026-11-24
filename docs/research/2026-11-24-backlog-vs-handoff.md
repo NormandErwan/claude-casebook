@@ -93,7 +93,7 @@ Each is a skill change, so it goes through casebook's `test-rule-change` before 
 - No per-task files (duplication), no committed handoffs (a handoff resumes work, a task describes
   new work). G4: no change, the skill already says "No implementation plan".
 - Option A kept for G2, G3, G5, with the `Context` limit loosened from "2-4 lines" to "short".
-  Filed as this repository's task "Carry ruled-out approaches, origins and owner decisions in backlog tasks".
+  Shipped as `backlog` 0.2.0 (PR #15 here), observed rather than A/B-tested (owner's choice).
 
 ### Before / after, owner-opinion task as on PR #140's branch
 

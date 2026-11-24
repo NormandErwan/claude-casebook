@@ -57,7 +57,8 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 - **Blocked by:** <task title>                 (omit when none)
 - **Context:** <why, what is settled, links: short>
 - **Next:** <first concrete step>
-- **Ruled out:** <approach tried> -> <result, link>   (omit when none)
+- **Ruled out:**                               (omit when none)
+  - <approach tried> -> <result, link>
 - **Done when:**
   - [ ] <testable criterion>
 - **Owner steps:** <when: after merge, before merge...>   (omit when none)
