@@ -44,8 +44,7 @@ jobs:
             done
           done
 
-  # Tags each marketplace-listed plugin whose version has no <name>--v<version> tag on origin yet.
-  # Pushes only from main; any other ref (pull requests included) prints the tags as a dry run.
+  # Tags each marketplace-listed plugin whose version has no <name>--v<version> tag yet.
   tag:
     needs: plugins
     runs-on: ubuntu-latest
@@ -53,23 +52,26 @@ jobs:
       contents: write
     concurrency: tag-${{ github.ref }}
     env:
-      MODE: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && '--push' || '--dry-run' }}
+      # Push only from main; anywhere else (pull requests included), print what would be tagged.
+      MODE: ${{ github.ref == 'refs/heads/main' && '--push' || '--dry-run' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm install -g "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"
       - name: Tag untagged listed plugins
         run: |
+          # claude plugin tag creates annotated tags, which need a committer identity.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for src in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
-            m="$src/.claude-plugin/plugin.json"
-            t="$(jq -r .name "$m")--v$(jq -r .version "$m")"
-            if git ls-remote --exit-code --tags origin "refs/tags/$t" >/dev/null; then
-              echo "$t: already on origin"
+          for plugin_dir in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
+            tag=$(jq -r '"\(.name)--v\(.version)"' "$plugin_dir/.claude-plugin/plugin.json")
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "$tag: already tagged"
             else
-              claude plugin tag "$src" "$MODE" || exit 1
+              claude plugin tag "$plugin_dir" "$MODE"
             fi
           done
