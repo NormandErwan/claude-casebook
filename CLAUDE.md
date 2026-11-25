@@ -27,6 +27,8 @@ another project.
 
 ## Releasing
 
-- A merge changes the version of a plugin listed in `.claude-plugin/marketplace.json` -> tag it
-  from `main` after the merge. Unlisted plugins are not tagged.
-- `claude plugin tag plugins/<name> --push` creates and pushes `<name>--v<version>`.
+- A plugin listed in `.claude-plugin/marketplace.json` gets a `<name>--v<version>` tag for each
+  version merged to `main`. Unlisted plugins are not tagged.
+- The `tag` job of `.github/workflows/validate.yml` pushes the missing tags after each push to
+  `main`; on a pull request it prints them as a dry run. Don't tag by hand: rerun the workflow
+  (`workflow_dispatch` on `main`) if its run failed.

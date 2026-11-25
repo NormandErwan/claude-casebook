@@ -13,23 +13,22 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 
 ### Decide when plugins get tagged, then tag them
 - **Status:** owner steps pending
-- **Context:** `git tag -l` is empty: no plugin has ever been released, `write-prompt` and `backlog` included although the marketplace lists them. `CLAUDE.md` "Releasing" says how to tag, not when; `casebook/retrospective.md` row 2026-11-03 "A repository rule says how to release but not when" proposes the fix and is settled by this task.
+- **Context:** `git tag -l` is empty: no plugin has ever been released, `write-prompt` and `backlog` included although the marketplace lists them. `CLAUDE.md` "Releasing" says when a listed plugin is tagged (PR#10).
   2026-11-24: a cloud session merged PR#15 and ran `claude plugin tag plugins/backlog --push` from
-  `main`: tag created locally, push refused (`HTTP 403` from the session's git proxy). Tagging stays
-  an owner step until the CI workflow proposed in `casebook/retrospective.md` (2026-11-24 row) exists.
-- **Next:** owner decided 2026-11-16: only marketplace-listed plugins (`CLAUDE.md` "Releasing", PR#10). After PR#10 merges, the owner runs the steps below; delete this task once both tags are on `origin`.
+  `main`: push refused (`HTTP 403` from the session's git proxy).
+  2026-11-25: the `tag` job of `.github/workflows/validate.yml` now pushes the missing tags from
+  `main` with `GITHUB_TOKEN` (retrospective row 2026-11-24, PR#18). Its dry run on the PR lists
+  `write-prompt--v2.2.0` and `backlog--v0.2.0`.
+- **Next:** after PR#18 merges, check its `validate` run on `main`; delete this task once both tags are on `origin`.
 - **Done when:**
   - [x] `CLAUDE.md` "Releasing" says when a plugin is tagged
   - [x] The retrospective row is `applied`, `Landed in` PR#10
   - [ ] Every plugin the new rule covers has a `<name>--v<version>` tag on `origin`
-- **Owner steps:** after merge, from an up-to-date `main` checkout. Shown for the two listed plugins; add one step per other plugin the decision covers.
-  1. Tag `write-prompt`: `claude plugin tag plugins/write-prompt --push`
-     - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.2.0`
-     - Undo: `git push origin :refs/tags/write-prompt--v2.2.0 && git tag -d write-prompt--v2.2.0`
-  2. Tag `backlog`: `claude plugin tag plugins/backlog --push`
-     - Check: `git ls-remote --tags origin` lists `refs/tags/backlog--v0.2.0`
-     - Undo: `git push origin :refs/tags/backlog--v0.2.0 && git tag -d backlog--v0.2.0`
-- **Out of scope:** a workflow that tags automatically (file it as its own task if wanted).
+- **Owner steps:** after PR#18 merges.
+  1. Check the `tag` job of the `validate` run on `main`: it logs `--push` for both plugins.
+     - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.2.0` and `refs/tags/backlog--v0.2.0`
+     - If the push is refused (a tag ruleset blocks `GITHUB_TOKEN`): allow GitHub Actions in the ruleset, then rerun the workflow from the Actions tab (`workflow_dispatch` on `main`)
+     - Undo: `git push origin :refs/tags/<tag>`
 
 ### Run the casebook evals and decide its marketplace entry
 - **Status:** ready
