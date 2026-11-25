@@ -4,6 +4,14 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Pinned: validate output changes between releases. Bump on purpose.
+  CLAUDE_CODE_VERSION: 2.1.312
 
 jobs:
   plugins:
@@ -13,8 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # Pinned: validate output changes between releases. Bump on purpose.
-      - run: npm install -g @anthropic-ai/claude-code@2.1.312
+      - run: npm install -g "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"
       - name: test-rule-change script tests
         run: python3 -m unittest discover -s plugins/casebook/skills/test-rule-change/scripts
       - name: Each plugin, warnings as errors
@@ -35,4 +42,34 @@ jobs:
               sv=$(sed -n 's/^version: *//p' "$s" | head -1)
               [ "$sv" = "$pv" ] || { echo "$s: $sv != plugin.json $pv"; exit 1; }
             done
+          done
+
+  # Tags each marketplace-listed plugin whose version has no <name>--v<version> tag on origin yet.
+  # Pushes only from main; any other ref (pull requests included) prints the tags as a dry run.
+  tag:
+    needs: plugins
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency: tag-${{ github.ref }}
+    env:
+      MODE: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && '--push' || '--dry-run' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"
+      - name: Tag untagged listed plugins
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for src in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
+            m="$src/.claude-plugin/plugin.json"
+            t="$(jq -r .name "$m")--v$(jq -r .version "$m")"
+            if git ls-remote --exit-code --tags origin "refs/tags/$t" >/dev/null; then
+              echo "$t: already on origin"
+            else
+              claude plugin tag "$src" "$MODE" || exit 1
+            fi
           done
