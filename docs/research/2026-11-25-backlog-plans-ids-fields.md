@@ -98,8 +98,8 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
 - Task finished -> tick its line in every plan that lists it. Task dropped -> remove its line from
   every plan; the commit message gives the reason.
 - Every line ticked and `Done when` met -> apply `Finished plan`.
-- Derived, to confirm during implementation: plan dropped -> apply `Finished plan`; its open tasks
-  stay in `## Tasks`, unplanned.
+- Plan dropped -> apply `Finished plan`; its open tasks stay in `## Tasks`, unplanned (owner,
+  2026-11-25).
 
 ### Priority and next task
 
