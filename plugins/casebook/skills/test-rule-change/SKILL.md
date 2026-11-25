@@ -1,6 +1,6 @@
 ---
 name: test-rule-change
-version: 0.7.0
+version: 0.7.1
 description: Use before merging a change to a rule that applies in every session (a CLAUDE.md
   rule, a SessionStart hook's text, a skill description) or to a rule that gates a push, a pull
   request or a deletion; also when about to claim that a rule change works, or when a reviewer
@@ -60,7 +60,7 @@ dir whose `SessionStart` hook prints that arm's `CLAUDE.md`.
 | 2 | `test-rule-change.py edit FILE OLD NEW`: derive the treatment text from the baseline | OLD matching 0 or 2+ times |
 | 2 | `test-rule-change.py build --out arms/<name> --claude-md FILE --skills DIR --evals DIR` | an existing `--out` |
 | 3 | `test-rule-change.py diff arms/<a> arms/<b> <path>...` | identical arms; any difference outside the named paths |
-| 4 | `test-rule-change.py preflight arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a permission denial. Warns on a call to an ungranted tool |
+| 4 | `test-rule-change.py preflight arms/<name> <case> <case flags>`: free checks, then a 1-run pilot | Bash granted without `bwrap`/`socat`; a red scaffold or `check.sh`; a load warning; the arm's `CLAUDE.md` or a skill missing from the session; foreign memory; a pilot that hit `Read-only file system`; a permission denial. Warns on a call to an ungranted tool |
 | 5 | `test-rule-change.py run arms/<name> <batch>/<name>.json <case flags> --runs N --max-cost-usd X`: also writes `<name>.runs.jsonl` (skills, tools, files written, denials, ungranted calls per run) | an existing result file; no cost cap |
 | 6 | `test-rule-change.py compare <batch>/compare.md <batch>/<a>.json <batch>/<b>.json` | an existing table; a case missing from an arm |
 

@@ -49,6 +49,12 @@ A case that grants Bash runs it under the OS sandbox, which needs `bubblewrap` a
 `preflight` refuses the case without them. In a cloud environment, put
 `apt-get update && apt-get install -y bubblewrap socat` in its setup script.
 
+`plugin eval` roots each run in `$TMPDIR`, but its sandbox denies writes under `/tmp`: with
+`TMPDIR=/tmp` (the Linux default) every Bash write fails with `Read-only file system`
+([anthropics/claude-code#104631](https://github.com/anthropics/claude-code/issues/104631)).
+`preflight` and `run` move `TMPDIR` to `~/.cache/claude-eval-tmp` (or `$CASEBOOK_EVAL_TMPDIR`)
+in that case. When you call `claude plugin eval` directly, set a `TMPDIR` outside `/tmp` yourself.
+
 Each subcommand refuses a known way to waste a run: an edit that matches twice, arms that differ
 elsewhere, a tool not granted, a red fixture, a rule that never reached the session, a result
 overwritten. First use: two `backlog` versions on 15 trigger cases, 90 Haiku runs in about five
