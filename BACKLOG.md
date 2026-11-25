@@ -158,3 +158,15 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 - **Done when:**
   - [ ] three sessions checked, each listed here with its id and whether the task carried both
   - [ ] a miss reported to the owner, or the provenance row noted "observed 3/3"
+
+### Add plans, short ids and extra fields to the backlog skill
+- **Status:** ready
+- **Context:** Design settled with the owner on 2026-11-25 in `session_01RGXu8YSp5BkSMSoRHF8L28`, from `backlog` 0.2.0 (commit `4c7b223`): `docs/research/2026-11-25-backlog-plans-ids-fields.md` holds every decision, the options ruled out and the target format. In short: plans list their tasks by id (a task may be in several plans), ids are short slugs frozen at creation, priority is file and list order, one generic `Extra fields` convention replaces any built-in tag or priority field, new `Finished plan` convention.
+- **Next:** draft the `SKILL.md` changes from the design doc, then run `test-rule-change` on them.
+- **Done when:**
+  - [ ] `plugins/backlog` is 0.3.0 and implements every rule in the design doc
+  - [ ] One eval case per mechanism listed in the design doc's "Implementation notes", passing
+  - [ ] Provenance row (`log-rule-incident`) and evidence (`test-rule-change`) recorded
+  - [ ] `claude plugin validate --strict plugins/backlog` passes
+  - [ ] This repo's `BACKLOG.md` migrated to ids
+- **Out of scope:** built-in priority or tag fields; tagging the release (the owner's step in "Decide when plugins get tagged, then tag them").
