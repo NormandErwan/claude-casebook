@@ -17,14 +17,14 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
   2026-11-24: a cloud session merged PR#15 and ran `claude plugin tag plugins/backlog --push` from
   `main`: push refused (`HTTP 403` from the session's git proxy).
   2026-11-25: the `tag` job of `.github/workflows/validate.yml` now pushes the missing tags from
-  `main` with `GITHUB_TOKEN` (retrospective row 2026-11-24, PR <PR>). Its dry run on the PR lists
+  `main` with `GITHUB_TOKEN` (retrospective row 2026-11-24, PR#18). Its dry run on the PR lists
   `write-prompt--v2.2.0` and `backlog--v0.2.0`.
-- **Next:** after PR <PR> merges, check its `validate` run on `main`; delete this task once both tags are on `origin`.
+- **Next:** after PR#18 merges, check its `validate` run on `main`; delete this task once both tags are on `origin`.
 - **Done when:**
   - [x] `CLAUDE.md` "Releasing" says when a plugin is tagged
   - [x] The retrospective row is `applied`, `Landed in` PR#10
   - [ ] Every plugin the new rule covers has a `<name>--v<version>` tag on `origin`
-- **Owner steps:** after PR <PR> merges.
+- **Owner steps:** after PR#18 merges.
   1. Check the `tag` job of the `validate` run on `main`: it logs `--push` for both plugins.
      - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.2.0` and `refs/tags/backlog--v0.2.0`
      - If the push is refused (a tag ruleset blocks `GITHUB_TOKEN`): allow GitHub Actions in the ruleset, then rerun the workflow from the Actions tab (`workflow_dispatch` on `main`)
