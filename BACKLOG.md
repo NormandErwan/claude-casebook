@@ -11,25 +11,6 @@ Work not done yet, one `###` section per task. Format and rules: the `backlog` s
 
 ## Tasks
 
-### Decide when plugins get tagged, then tag them
-- **Status:** owner steps pending
-- **Context:** `git tag -l` is empty: no plugin has ever been released, `write-prompt` and `backlog` included although the marketplace lists them. `CLAUDE.md` "Releasing" says when a listed plugin is tagged (PR#10).
-  2026-11-24: a cloud session merged PR#15 and ran `claude plugin tag plugins/backlog --push` from
-  `main`: push refused (`HTTP 403` from the session's git proxy).
-  2026-11-25: the `tag` job of `.github/workflows/validate.yml` now pushes the missing tags from
-  `main` with `GITHUB_TOKEN` (retrospective row 2026-11-24, PR#18). Its dry run on the PR lists
-  `write-prompt--v2.2.0` and `backlog--v0.2.0`.
-- **Next:** after PR#18 merges, check its `validate` run on `main`; delete this task once both tags are on `origin`.
-- **Done when:**
-  - [x] `CLAUDE.md` "Releasing" says when a plugin is tagged
-  - [x] The retrospective row is `applied`, `Landed in` PR#10
-  - [ ] Every plugin the new rule covers has a `<name>--v<version>` tag on `origin`
-- **Owner steps:** after PR#18 merges.
-  1. Check the `tag` job of the `validate` run on `main`: it logs `--push` for both plugins.
-     - Check: `git ls-remote --tags origin` lists `refs/tags/write-prompt--v2.2.0` and `refs/tags/backlog--v0.2.0`
-     - If the push is refused (a tag ruleset blocks `GITHUB_TOKEN`): allow GitHub Actions in the ruleset, then rerun the workflow from the Actions tab (`workflow_dispatch` on `main`)
-     - Undo: `git push origin :refs/tags/<tag>`
-
 ### Run the casebook evals and decide its marketplace entry
 - **Status:** ready
 - **Context:** `plugins/casebook/evals/` has 2 cases (`correction-files-row`, `control-no-correction`), written and load-checked, never scored (`EVALS.md`). Retrospective row 2026-11-03 "An eval case grades a file the agent must write while the case grants no tool that writes files" asks for a pilot first; `EVALS.md` now passes `--allow-tools Write Edit`. A plugin enters the marketplace only once its evals pass (`CLAUDE.md`).
