@@ -11,6 +11,46 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
 - Owner steps: on
 - Extra fields: none
 
+## Plans
+
+### reliable-eval-evidence: Make an eval pass prove what the tested rule adds
+- **Goal:** a passing eval case is evidence for the rule it targets, not for the whole plugin or the model's own reading.
+- **Done when:**
+  - [ ] `test-rule-change` ties each changed rule to a case, or marks it uncovered with its reason
+  - [ ] where research and eval results live is written in `CLAUDE.md` "Layout"
+- **Tasks:**
+  - [ ] map-rules-to-cases
+  - [ ] decide-results-location
+  - [ ] move-write-skill-evals
+
+### list-evaluated-plugins: List every evaluated plugin in the marketplace
+- **Goal:** each plugin under `plugins/` is in `.claude-plugin/marketplace.json`, or the reason it is not is in its `casebook/provenance.md` row.
+- **Done when:**
+  - [ ] every plugin under `plugins/` listed, or its reason recorded in `casebook/provenance.md`
+- **Tasks:**
+  - [ ] run-casebook-evals
+  - [ ] run-prevent-drift-evals
+  - [ ] run-find-cause-evals
+  - [ ] recheck-write-hook-behaviours
+  - [ ] run-write-hook-evals
+  - [ ] run-write-skill-evals
+
+### write-skill-current-models: Fit write-skill to current models
+- **Goal:** `write-skill`'s wording and test rule are measured on current models and agree with `test-rule-change`.
+- **Done when:**
+  - [ ] `pressure-a1`..`a3` re-run against the baseline, results in the `write-skill` provenance row
+- **Tasks:**
+  - [ ] run-write-skill-evals
+  - [ ] reword-write-skill-musts
+
+### backlog-tested: Cover every backlog rule with a case
+- **Goal:** each rule and red flag of the `backlog` skill has a case that fails when that rule alone is removed, or a written reason it has none.
+- **Done when:**
+  - [ ] the `backlog` provenance row lists each rule with its case or its reason
+- **Tasks:**
+  - [ ] test-backlog-plugin
+  - [ ] check-backlog-ruled-out
+
 ## Tasks
 
 ### run-casebook-evals: Run the casebook evals and decide its marketplace entry
@@ -68,7 +108,8 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
 
 ### test-backlog-plugin: Test the backlog plugin beyond its pilot
 - **Status:** ready
-- **Context:** `backlog` is listed in the marketplace on a pilot (1 run per arm) plus a trigger A/B on one case, a fuller run waived at the time (its `casebook/provenance.md` row). The owner now wants it tested properly. Untested behaviours include: extending a matching task instead of duplicating it, working a task (status, `Next` rewrite), deleting a done task, `Owner steps` listed in the reply, `Blocked by`, the archive and external-tracker conventions.
+- **Blocked by:** map-rules-to-cases
+- **Context:** `backlog` is listed in the marketplace on a pilot (1 run per arm) plus a trigger A/B on one case, a fuller run waived at the time (its `casebook/provenance.md` row). The owner now wants it tested properly. Untested behaviours include: extending a matching task instead of duplicating it, working a task (status, `Next` rewrite), deleting a done task, `Owner steps` listed in the reply, `Blocked by`, the archive and external-tracker conventions. Rules of 0.3.0 with no case (`casebook/retrospective.md` row 2026-11-26): plans in an external tracker, a task in several plans ranked by its best plan, a removed extra-field value, the archive conventions.
 - **Next:** list the skill's rules and red flags with no case covering them, then write cases for the ones that matter most, with `scaffold.sh` fixtures like the existing ones.
 - **Done when:**
   - [ ] New cases under `plugins/backlog/evals/`, listed in `EVALS.md`
@@ -105,7 +146,7 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
   - [ ] the retrospective row reads `applied` with this PR
 
 ### first-maintenance-pass: Run the first maintenance pass
-- **Status:** ready
+- **Status:** blocked: due 2027-02-03, or earlier if a new model generation ships
 - **Context:** `log-rule-incident` "Maintenance pass" (PR#10): on each new model generation and every three months, `/doctor prompt-audit` per plugin, then on the repository; each finding kept becomes a `retrospective.md` row. The last audits ran 2026-11-03 (PR #5), so the next pass is due by 2027-02-03, or earlier if a new model generation ships.
 - **Next:** on the due date, run the audit on each plugin under `plugins/`, then on `.`.
 - **Done when:**
@@ -141,3 +182,12 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
 - **Done when:**
   - [ ] three sessions checked, each listed here with its id and whether the task carried both
   - [ ] a miss reported to the owner, or the provenance row noted "observed 3/3"
+
+### map-rules-to-cases: Tie each eval case to the rule it proves
+- **Status:** ready
+- **Context:** `casebook/retrospective.md` row 2026-11-26 (skill-gap): the `backlog` 0.3.0 cases came from the design doc's implementation notes, not from the `SKILL.md` rules; 3 of 6 new cases passed without the plugin at pilot; two with-arm fails were grader or fixture faults, found only by reading the runs; `test-rule-change` says "Graders are not checked". The row asks to explore in a separate session before deciding.
+- **Next:** on `backlog` 0.3.0, list its rules and red flags, then build an arm with one rule alone removed (`test-rule-change.py edit`) and run that rule's case against it.
+- **Done when:**
+  - [ ] the 2026-11-26 row decided (applied, changed or rejected), with the exploration's result
+  - [ ] if applied: `test-rule-change` asks for the rule-to-case list, the single-rule ablation, and a grader check on a known pass and a known fail; plugin version bumped
+- **Out of scope:** writing the missing `backlog` cases (`test-backlog-plugin`).
