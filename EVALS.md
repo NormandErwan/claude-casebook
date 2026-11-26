@@ -1,8 +1,8 @@
 # Evals
 
 How this repository runs its plugins' evals. The protocol (arms, pilot, recording) is
-`test-rule-change`'s; this page only holds what is specific to these plugins. Only `write-prompt`'s cases have been
-run in full (results in the `write-prompt` row of `casebook/provenance.md`; `backlog`'s were piloted at 1 run per arm, then `first-use-asks-conventions` A/B-tested 0.1.0 vs 0.1.1 at 5 runs, in its row); every other case is written, load-checked, and
+`test-rule-change`'s; this page only holds what is specific to these plugins. Only `write-prompt`'s and `backlog`'s cases have been
+run in full (results in their rows of `casebook/provenance.md`; `backlog`'s 7 cases at 5 runs per arm on 0.3.0); every other case is written, load-checked, and
 unscored.
 
 ## Cases
@@ -24,9 +24,10 @@ history: its numbers are not reproducible and are not compared with these.
 | `write-prompt` | `behaviour` | 7 | New, from the craft-prompt rebuild |
 | `write-prompt` | `trigger` | 28 (14 should-fire, 14 should-not; 12 of them `holdout`) | New |
 | `backlog` | `first-use`, `conventions`, `control` | 3 | New, minimal by the owner's request; fixtures written by each case's `scaffold.sh` |
+| `backlog` | `migration`, `plans`, `extra-fields` | 4 | New in 0.3.0, one per mechanism of `docs/research/2026-11-25-backlog-plans-ids-fields.md`; `first-use-asks-conventions` gains `asks-new-lines` for the two new convention lines; `drop-plan-keeps-tasks` (plan dropped, tasks kept) is a regression check: the no-plugin arm passed it 2/2 at pilot |
 
 Cases run `claude-sonnet-5-5`, 5 runs per arm, except `write-prompt`'s: `claude-opus-5-5`, 3 runs
-per arm, and `backlog`'s pilot: 1 run per arm. `llm` graders use the default judge
+per arm. `llm` graders use the default judge
 (`haiku`), stated with the results. A `tool_used: Skill` grader (`fired`, `skill-fired`) is a
 plugin-fired indicator, not part of the score.
 
@@ -47,7 +48,9 @@ claude plugin eval plugins/write-skill --tag trigger --ablation none --max-cost-
 claude plugin eval plugins/casebook --allow-tools Write Edit --max-cost-usd <cap>
 
 # backlog stages app.py (and BACKLOG.md) with a scaffold script: add --scaffold.
-claude plugin eval plugins/backlog --scaffold --allow-tools Write Edit --max-cost-usd <cap>
+# Auto memory off: otherwise the no-plugin arm tries to save "note for later" to its memory
+# directory, is denied, and replies about that denial (backlog 0.3.0 pilot).
+CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 claude plugin eval plugins/backlog --scaffold --allow-tools Write Edit --max-cost-usd <cap>
 ```
 
 `--max-cost-usd 0` loads every case and stops before the first run, at no cost. It catches a

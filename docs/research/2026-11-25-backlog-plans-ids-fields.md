@@ -1,9 +1,8 @@
 # Backlog: plans, short ids and extra fields
 
 Design for the next `backlog` skill version, settled with the owner on 2026-11-25 in
-`session_01RGXu8YSp5BkSMSoRHF8L28`, starting from `backlog` 0.2.0 (commit `4c7b223`). Not
-implemented yet: the `BACKLOG.md` task "Add plans, short ids and extra fields to the backlog skill"
-tracks the work.
+`session_01RGXu8YSp5BkSMSoRHF8L28`, starting from `backlog` 0.2.0 (commit `4c7b223`).
+Implemented in `backlog` 0.3.0 (PR #21); evidence in its `casebook/provenance.md` row.
 
 ## Need
 
