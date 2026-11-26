@@ -52,8 +52,10 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
   tasks and plans; a collision -> add a word.
 - An id never changes, even when the title does. `Blocked by` and a plan's `Tasks` cite ids.
 - External tracker: the issue number is the id.
-- `BACKLOG.md` whose tasks have no id (an older version) -> on the first edit, give every task
-  its id and rewrite every `Blocked by` from title to id, all in one commit; say so in one line.
+- `BACKLOG.md` whose tasks have no id (an older version) -> on the first edit, in one commit:
+  give every task its id, rewrite every `Blocked by` from title to id, add the `Conventions`
+  lines the block lacks with their defaults, and change the header to "one `###` section per
+  plan or task". Say so in one line.
 
 ## Add a task
 
