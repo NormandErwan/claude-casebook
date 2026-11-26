@@ -24,7 +24,7 @@ history: its numbers are not reproducible and are not compared with these.
 | `write-prompt` | `behaviour` | 7 | New, from the craft-prompt rebuild |
 | `write-prompt` | `trigger` | 28 (14 should-fire, 14 should-not; 12 of them `holdout`) | New |
 | `backlog` | `first-use`, `conventions`, `control` | 3 | New, minimal by the owner's request; fixtures written by each case's `scaffold.sh` |
-| `backlog` | `migration`, `plans`, `extra-fields` | 4 | New in 0.3.0, one per mechanism of `docs/research/2026-11-25-backlog-plans-ids-fields.md`; `first-use-asks-conventions` gains `asks-new-lines` for the two new convention lines |
+| `backlog` | `migration`, `plans`, `extra-fields` | 4 | New in 0.3.0, one per mechanism of `docs/research/2026-11-25-backlog-plans-ids-fields.md`; `first-use-asks-conventions` gains `asks-new-lines` for the two new convention lines; `drop-plan-keeps-tasks` (plan dropped, tasks kept) is a regression check: the no-plugin arm passed it 2/2 at pilot |
 
 Cases run `claude-sonnet-5-5`, 5 runs per arm, except `write-prompt`'s: `claude-opus-5-5`, 3 runs
 per arm. `llm` graders use the default judge
