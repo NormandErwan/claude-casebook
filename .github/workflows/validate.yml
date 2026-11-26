@@ -57,6 +57,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # A shallow clone (the default depth 1) fetches the commit by SHA and skips tags even
+          # with fetch-tags: true, so existing tags looked missing and the push was rejected.
+          fetch-depth: 0
           fetch-tags: true
       - uses: actions/setup-node@v4
         with:
