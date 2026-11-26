@@ -48,7 +48,9 @@ claude plugin eval plugins/write-skill --tag trigger --ablation none --max-cost-
 claude plugin eval plugins/casebook --allow-tools Write Edit --max-cost-usd <cap>
 
 # backlog stages app.py (and BACKLOG.md) with a scaffold script: add --scaffold.
-claude plugin eval plugins/backlog --scaffold --allow-tools Write Edit --max-cost-usd <cap>
+# Auto memory off: otherwise the no-plugin arm tries to save "note for later" to its memory
+# directory, is denied, and replies about that denial (backlog 0.3.0 pilot).
+CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 claude plugin eval plugins/backlog --scaffold --allow-tools Write Edit --max-cost-usd <cap>
 ```
 
 `--max-cost-usd 0` loads every case and stops before the first run, at no cost. It catches a
