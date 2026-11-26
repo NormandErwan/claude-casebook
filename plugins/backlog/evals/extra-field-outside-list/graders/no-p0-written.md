@@ -1,6 +1,6 @@
 ---
 type: "regex"
-pattern: "P0"
+pattern: "\\*\\*Priority:\\*\\*\\s*P0"
 match: "count:0"
 target: {"source": "file", "path": "BACKLOG.md"}
 ---
