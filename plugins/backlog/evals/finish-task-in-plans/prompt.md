@@ -1,5 +1,5 @@
 ---
-description: "Finished task listed in two plans: section deleted, line ticked in both plans"
+description: "Finished task in two plans: section deleted, ticked in the open plan, the plan it completes deleted"
 tags: ["plans"]
 runs: 1
 model: "claude-sonnet-5-5"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Shared fixture: app.py plus a 0.3.0 BACKLOG.md with two plans and four tasks.
 # Rank: plan release-1-0 lists add-config-errors (blocked) then check-currency (blocked by it);
-# plan docs-pass lists write-readme (ready); tidy-imports is unplanned but first in the file.
+# plan docs-pass lists write-readme (ready); fix-cent-rounding is unplanned but first in the file.
 set -euo pipefail
 bash "$(dirname "$0")/fixture-app.sh"
 cat > BACKLOG.md <<'MD'
@@ -38,12 +38,12 @@ Work not done yet, one `###` section per plan or task. Format and rules: the `ba
 
 ## Tasks
 
-### tidy-imports: Sort the imports in app.py
+### fix-cent-rounding: Round discounted prices half up to the cent
 - **Status:** ready
-- **Context:** cosmetic; no behaviour change.
-- **Next:** Sort the import block of `app.py` alphabetically.
+- **Context:** `apply_discount` uses `round`, which rounds half to even on floats: `apply_discount(0.125, 0)` gives 0.12, customers expect 0.13.
+- **Next:** Compute in `decimal.Decimal` with `ROUND_HALF_UP` in `apply_discount`.
 - **Done when:**
-  - [ ] Imports in `app.py` are sorted.
+  - [ ] `apply_discount(0.125, 0)` returns 0.13.
 
 ### write-readme: Write a README for app.py
 - **Status:** ready

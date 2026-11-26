@@ -2,6 +2,6 @@
 type: "regex"
 pattern: "^\\s*- \\[x\\] check-currency\\s*$"
 flags: "mi"
-match: "count:2"
+match: "contains"
 target: {"source": "file", "path": "BACKLOG.md"}
 ---
