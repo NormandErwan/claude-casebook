@@ -24,6 +24,14 @@ This skill bundles no third-party file. Everything in it is original to this rep
 
 ## Inspirations credited by that research
 
-Not bundled, no text copied: MrLesk/Backlog.md (MIT; one task per PR, search before adding)
+Not bundled, no text copied: MrLesk/Backlog.md (MIT; one task per PR, search before adding;
+in 0.3.0, its milestones as one model for plans)
 and mattpocock/skills `to-tickets`, `triage` (MIT; `Blocked by` edges, the `needs owner`
 status, testable done criteria and explicit out of scope).
+
+## Inspirations for 0.3.0
+
+Not bundled, no text copied: GitHub Projects custom fields (text, number, date, single select,
+iteration; docs.github.com "Understanding fields") and an issue in several projects, the model
+for `Extra fields` and for a task listed in several plans. Design and checks:
+`docs/research/2026-11-25-backlog-plans-ids-fields.md`.
